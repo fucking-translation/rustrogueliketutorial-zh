@@ -184,37 +184,37 @@ fn main() -> rltk::BError {
 3. `impl GameState for State`有点拗口！我们告诉Rust我们的`State`结构体需要*实现*`GameState`接口。Trait和其他语言中的接口或基类很像：他们设置了一个结构让你可以实现自己的代码，然后可以与他们提供的库进行交互 - 如果没有trait，类库需要知道关于你代码中的所有信息。在这里，`GameState`是一个RLTK提供的trait。RLTK需要你满足一点 - 它在它的每一帧上调用你的程序。你可以在[这里](https://kaisery.github.io/trpl-zh-cn/ch10-02-traits.html)学习trait相关的内容。
 4. `fn tick(&mut self, ctx : &mut Rltk)`是一个函数定义。这里是实现GameState接口的地方，所以我们需要为这个trait实现这个函数 - 它需要匹配trait提供的类型。函数是构建Rust代码块的基础，我推荐[rust程序设计中的这一节]()(https://kaisery.github.io/trpl-zh-cn//ch03-03-how-functions-work.html). 
     1. 在该例中，`fn tick`意思是“创建一个函数，将其命名为tick”(它被称为“tick”是因为它在渲染的每一帧上都要“滴答”一下，在游戏编程中，通常将每次迭代称为tick)。 
-    2. It doesn't end with an `-> type`, so it is equivalent to a `void` function in C - it doesn't return any data once called. The parameters can also benefit from a little explanation. 
-    3. `&mut self` means "this function requires access to the parent structure, and may change it" (the `mut` is short for "mutable" - meaning it can change variables inside the structure - "state"). You can also have functions in a structure that just have `&self` - meaning, we can *see* the content of the structure, but can't change it. If you omit the `&self` altogether, the function can't see the structure at all - but can be called as if the structure was a *namespace* (you see this a lot with functions called `new` - they make a new copy of the structure for you).
-    4. `ctx: &mut Rltk` means "pass in a variable called `ctx`" (`ctx` is an abbreviation for "context"). The colon indicates that we're specifying what *type* of variable it must be. 
-    5. `&` means "pass a reference" - which is a *pointer* to an existing copy of the variable. The variable isn't copied, you are working on the version that was passed in; if you make a change, you are changing the original. [The Rust Book explains this better than I can](https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html).
-    6. `mut` once again indicates that this is a "mutable" reference: you are allowed to make changes to the context.
-    7. Finally `Rltk` is the *type* of the variable you are receiving. In this case, it's a `struct` defined inside the `RLTK` library that provides various things you can do to the screen.
-5. `ctx.cls();` says "call the `cls` function provided by the variable `ctx`. `cls` is a common abbreviation for "clear the screen" - we're telling our *context* that it should clear the virtual terminal. It's a good idea to do this at the beginning of a frame, unless you specifically don't want to.
-6. `ctx.print(1, 1, "Hello Rust World");` is asking the *context* to *print* "Hello Rust World" at the location (1,1).
-7. Now we get to `fn main()`. *Every* program has a `main` function: it tells the operating system where to start the program.
+    2. 它并没有以`-> type`作为结束，所以它相当于C语言中的`void`函数 - 它一旦被调用不会返回任何值。 该函数的参数也可以从一些解释中收益。
+    3. `&mut self`意味着“该函数需要访问结构体State，并且可能会修改他” (`mut`是“mutable”的简写 - 表示它可以修改结构体中的变量 - “state”)。 结构体中的函数也可以只包含`&self` - 意思是，我们可以看到结构体的内容，但是不会修改它。如果你忽略了`&self`，函数将无法查看结构体中的内容 - 但是可以被调用，仿佛结构体就是一个命名空间一样。(你可以经常看到这种名为`new`的函数 - 它们为你提供了该结构体的副本 - `State::new()`).
+    4. `ctx: &mut Rltk`意思是“传入了一个名为`ctx`的变量" (`ctx`是“context”的缩写). 冒号表示我们为这个变量指定了类型。
+    5. `&`意思是“传入了一个引用” - 这是指向变量现有副本的指针。该变量没有被复制，你正在处理传入的版本；如果你做了修改，你也会修改原件。[rust程序设计解释的比我要好](https://kaisery.github.io/trpl-zh-cn/ch04-02-references-and-borrowing.html).
+    6. `mut`再一次表示它是一个可变引用：你被允许去修改上下文。
+    7. 最后`Rltk`是你将接收到的变量类型。在此例中，它是`RLTK`库中定义的结构体，它提供了你可以在屏幕上执行的各种操作。
+5. `ctx.cls();`是指“调用变量`ctx`提供的`cls`函数“。`cls`是“clear the screen”的缩写 - 我们告诉上下文应该清空虚拟终端。在某一帧的最开始执行这个方法是个明智的选择，除非你确实不想这么做。
+6. `ctx.print(1, 1, "Hello Rust World");`是要求上下文在位置(1,1)处打印“Hello Rust World”。
+7. 现在轮到`fn main()`了。*每个*可运行的程序都有一个`main`函数：它告诉操作系统如何启动程序。
 8. ```
     use rltk::RltkBuilder;
     let context = RltkBuilder::simple80x50()
         .with_title("Roguelike Tutorial")
         .build()?;
    ```
-   is an example of calling a *function* from inside a `struct` - where that struct doesn't take a "self" function. In other languages, this would be called a *constructor*. We're calling the function `simple80x50` (which is a builder provided by RLTK to make a terminal 80 characters wide by 50 characters high. The window title is "Roguelike Tutorial".
-9. `let gs = State{ };` is an example of a *variable* assignment (see [The Rust Book](https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html)). We're making a new variable called `gs` (short for "game state"), and setting it to be a copy of the `State` struct we defined above.
-10. `rltk::main_loop(context, gs)` calls into the `rltk` namespace, activating a function called `main_loop`. It needs both the `context` and the `GameState` we made earlier - so we pass those along. RLTK tries to take some of the complexity of running a GUI/game application away, and provides this wrapper. The function now takes over control of the program, and will call your `tick` function (see above) every time the program "ticks" - that is, finishes one cycle and moves to the next. This can happen 60 or more times per second!
+   是在结构体内调用一个函数的例子 - 该函数并没有携带“self”。在其他语言中，这可能会被称为构造函数。我们将该函数称为`simple80x50` (它是RLTK提供的结构体，可以使终端有80个字节的宽度，50个字节的高度，窗口的标题为“Roguelike Tutorial”。
+9. `let gs = State{ };`是一个变量分配的例子(请查看[The Rust Book](https://kaisery.github.io/trpl-zh-cn/ch03-01-variables-and-mutability.html))。我们创建了一个新的变量叫做`gs`(“game state”的简称)，并将其赋值为上面定义的`State`结构体的副本。
+10. `rltk::main_loop(context, gs)`在命令空间`rltk`内被调用，激活了一个叫做`main_loop`的函数。它需要我们之前创建好的`context`和`GameState` - 所以我们将其传过去即可。RLTK尝试去除一些运行GUI/游戏应用程序的某些复杂性，并提供一些包装。现在该函数将接管并控制程序，并在每次程序“滴答”时调用`tick`函数 - 也就是说，一个周期结束将会进入下一个周期，每秒钟可以发生60甚至更多次。
 
-Hopefully that made some sense!
+希望这些解释将起到一些用处！
 
-## Playing with the tutorials
+## 跟着教程一起玩游戏
 
-You'd probably like to play with the tutorial code without having to type it all in! The good news is that it is up on GitHub for your perusal. You need to have `git` installed (RustUp should have helped you with that). Choose where you would like to have the tutorials, and open a terminal:
+你可能喜欢直接运行教程的代码，而不是一个一个的敲代码！好消息是，代码托管在Github上可以供你细读(perusal)。你需要安装`git`(rustup可以帮到你)。选择一个你将要存放教程代码的目录，并打开终端：
 
 ```bash
 cd <path to tutorials>
 git clone https://github.com/thebracket/rustrogueliketutorial .
 ```
 
-After a while, this will download the complete tutorial (including the source code for this book!). It is laid out as follows (this isn't complete!):
+过了一会儿，它将下载完整的教程代码(包括这本书的源码)。像下面这样展示(并不完全)：
 
 ```
 ───book
@@ -227,15 +227,15 @@ After a while, this will download the complete tutorial (including the source co
 ├───src
 ```
 
-What's here?
+这是哪儿?
 
-* The `book` folder contains the source code for this book. You can ignore it, unless you feel like correcting my spelling!
-* Each chapter's example code is contained in `chapter-xy-name` folders; for example, `chapter-01-hellorust`.
-* The `src` folder contains a simple script to remind you to change to a chapter folder before running anything.
-* `resources` has the contents of the ZIP file you downloaded for this example. All the chapter folders are preconfigured to use this.
-* `Cargo.toml` is setup to include all of the tutorials as "workspace entries" - they share dependencies, so it won't eat your whole drive re-downloading everything each time you use it.
+* `book`目录存放这个教程的内容。你可以将它忽略，直到你想要检查我的拼写是否有问题！
+* 每一章节的代码示例都在`chapter-xy-name`文件夹下；举个例子，`chapter-01-hellorust`。
+* `src`文件夹内包含了一些简单的脚本，以便在运行之前提醒你对章节的目录进行修改。
+* `resources`有一些你为这个示例下载的ZIP文件。每个章节的目录都已预先配置使用此文件夹。
+* `Cargo.toml`设置包含了所有教程的“工作空间” - 他们共享依赖，所以它不会占用你的整个驱动，不会在你每次使用时重新下载所有的东西。
 
-To run an example, open your terminal and:
+运行这个示例，打开你的终端：
 
 ```bash
 cd <where you put the tutorials>
@@ -243,33 +243,32 @@ cd chapter-01-hellorust
 cargo run
 ```
 
-If you are using *Visual Studio Code*, you can instead use *File -> Open Folder* to open the whole directory that you checked out. Using the inbuilt terminal, you can simply `cd` to each example and `cargo run` it.
-
-## Accessing Tutorial Source Code
+如果你使用了*Visual Studio Code*，你可以使用*File -> Open Folder*打开你已检查过的整个目录。使用终端内置的命令，你可以`cd`到每个教程中并执行`cargo run`。
+## 获取教程源码
 
 You can get to the source code for all of the tutorials at [https://github.com/thebracket/rustrogueliketutorial](https://github.com/thebracket/rustrogueliketutorial).
 
-## Updating the Tutorial
+## 更新教程
 
-I update this tutorial a lot - adding chapters, fixing issues, etc. You will periodically want to open the tutorial directory, and type `git pull`. This tells `git` (the source control manager) to go to the `Github` repository and look for what's new. It will then download everything that has changed, and you once again have up-to-date tutorials.
+我经常更新这个教程 - 添加新的章节，修复问题等。你将会定期的打开教程的目录，并输入`git pull`。它告诉`git`(源码版本控制)去github仓库中查看是否有新更新的内容。它将会下载所有变更过的内容，然后你就再一次拥有了最新的教程。
 
-## Updating Your Project
+## 更新你的项目
 
-You may find that `rltk_rs` or another package has updated, and you would like the latest version. From your project's folder, you can type `cargo update` to update *everything*. You can type `cargo update --dryrun` to see what it would like to update, and not change anything (people update their crates a lot - so this can be a big list!).
+你可能会发现`rltk_rs`或其他的包被修改过，然后你想要最新的版本。在项目目录下，你可以输入`cargo update`来更新每一个依赖。你也可以输入`cargo update --dryrun`来查看哪些需要更新，这不会改变任何东西(人们经常会更新他们的crate，所以这是一个很大的清单)。
 
-## Updating Rust Itself
+## 更新Rust
 
-I don't recommend running this from inside `Visual Studio Code` or another IDE, but if you'd like to ensure that you have the most recent release of `Rust` (and associated tools), you can type `rustup self update`. This updates the Rust update tools (I know that sounds rather recursive). You can then type `rustup update` and install the latest versions of all of the tools.
+你可以运行`rustup self update`这条命令。我不太建议在`Visual Studio Code`或其他IDE中执行这个命令，但是如果你想要这样做请确保你已经有了最新发布的`Rust`版本(和相关的工具)。这将更新Rust的更新工具(我知道这听起来很递归)。然后你可以输入`rustup update`并下载所有工具的最新版本。
 
-## Getting Help
+## 获取帮助
 
-There's a number of ways to get help:
+这里有很多方式来获取帮助：
 
-* Feel free to contact me (I'm `@herberticus` on Twitter) if you have any questions, ideas for improvements, or things you'd like me to add.
-* The fine people on [/r/rust](https://www.reddit.com/r/rust/) are VERY helpful with Rust language issues.
-* The awesome people of [/r/roguelikedev](https://www.reddit.com/r/roguelikedev/) are VERY helpful when it comes to Roguelike issues. Their Discord is pretty active, too.
+* 如果你有任何的问题，提升的建议或者你想要我加的任何东西，可以随时联系我(推特名是`@herberticus`)。
+* [/r/rust](https://www.reddit.com/r/rust/)上的好人对解决Rust问题很有帮助。
+* [/r/roguelikedev](https://www.reddit.com/r/roguelikedev/)上的杰出人才对Roguelike的问题十分有帮助。他们的Disord也非常活跃。
 
-[Run this chapter's example with web assembly, in your browser (WebGL2 required)](https://bfnightly.bracketproductions.com/rustbook/wasm/chapter-01-hellorust/)
+[在浏览器中使用web assembly运行这些章节的代码(需要WebGL2)](https://bfnightly.bracketproductions.com/rustbook/wasm/chapter-01-hellorust/)
 
 ---
 
