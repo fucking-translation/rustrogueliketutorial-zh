@@ -66,13 +66,13 @@ Cargo.toml
 
 它们是：
 
-* 如果你在使用git，那么`.gitignore`会很方便 - it stops you from accidentally putting files into the git repository that don't need to be there. If you aren't using git, you can ignore it.
-* `src\main.rs` is a simple Rust "hello world" program source.
-* `Cargo.toml` defines your project, and how it should be built.
+* 如果你在使用git，那么`.gitignore`会很方便 - 它可以防止你意外的将不需要的文件放入git仓库中。如果你没有使用git，可以忽略这个。
+* `src\main.rs` 是一个简单的Rust的“hello world”程序源码。
+* `Cargo.toml` 定义了你的项目以及你应该如何构建它。
 
-### Quick Rust Introduction - The Anatomy of Hello World
+### Rust快速入门 - 解刨(Anatomy)Hello World
 
-The auto-generated `main.rs` file looks like this:
+自动生成的`main.rs`文件开起来像这样：
 
 ```rust
 fn main() {
@@ -80,48 +80,48 @@ fn main() {
 }
 ```
 
-If you've used other programming languages, this should look somewhat familiar - but the syntax/keywords are probably different. *Rust* started out as a mashup between [ML](https://en.wikipedia.org/wiki/ML_(programming_language)) and C, with the intent to create a flexible "systems" language (meaning: you can write bare-metal code for your CPU without needing a virtual machine like Java or C# do). Along the way, it inherited a lot of syntax from the two languages. I found the syntax looked *awful* for the first week of using it, and came quite naturally after that. Just like a human language, it takes a while for your brain to key into the syntax and layout.
+如果你使用过其他的编程语言，这看起来可能有些熟悉 - 但是语法/关键字可能不同。*Rust*开始时是介于[ML](https://en.wikipedia.org/wiki/ML_(programming_language))和C之间的混搭，旨在创造一种灵活的“系统级”语言(意味着：你可以为CPU编写裸机代码，而不需要像Java或C#一样借助虚拟机)。在此过程中，它继承了两种语言的许多语法。我在使用它的第一周时发现语法看起来很“糟糕”，但在那之后再用起来就觉得很自然了。就像人类语言一样，大脑需要一段时间来记住它的语法和设计。
 
-So what does this all mean?
+那么，这些都意味着什么呢？
 
-1. `fn` is Rust's keyword for *function*. In JavaScript or Java, this would read `function main()`. In C, it would read `void main()` (even though `main` is meant to return an `int` in C). In C#, it would be `static void Main(...)`.
-2. `main` is the *name* of the function. In this case, the name is a special case: the operating system needs to know what to run first when it loads a program into memory - and Rust will do the extra work to mark `main` as the first function. You generally *need* a `main` function if you want your program to do anything, unless you are making a *library* (a collection of functions for other programs to use).
-3. The `()` is the function *arguments* or *parameters*. In this case, there aren't any - so we just use empty opening and closing parentheses.
-4. The `{` indicates the start of a *block*. In this case, the block is the *body* of the function. Everything within the `{` and `}` is the *content* of the function: instructions for it to run, in turn. Blocks also denote *scope* - so anything you declare inside the function has its access limited to that function. In other words, if you make a variable inside a function called `cheese` - it won't be visible from inside a function called `mouse` (and vice versa). There are ways around this, and we'll cover them as we build our game.
-5. `println!` is a *macro*. You can tell Rust macros because they have an `!` after their name. You can learn all about macros [here](https://doc.rust-lang.org/1.2.0/book/macros.html); for now, you just need to know that they are *special* functions that are parsed into *other code* during compilation. Printing to the screen can be quite complicated - you might want to say more than "hello world" - and the `println!` macro covers a *lot* of formatting cases. (If you are familiar with C++, it's equivalent to `std::fmt`. Most languages have their own string formatting system, since programmers tend to have to output a lot of text!)
-6. The final `}` closes the block started in `4`.
+1. `fn`是Rust中*函数*的关键字。在JavaScript或Java中，这可能会读作`function main()`。在C中，这可能会读作`void main()`(虽然`main`在C中旨在返回一个`int`)。在C#中，它可能会是`static void Main(...)`。
+2. `main`是函数的*名称*。在这里，这个名称是一种特殊的情况：当操作系统加载一个程序到内存中时，它需要知道它首先应该运行什么 - Rust做了一些额外的工作来标志`main`是第一个需要运行的函数。如果你想要你的程序可以运行起来，通常需要一个`main`函数，除非你开发的是一个*类库*(为其他程序提供的函数集合)。
+3. `()`中包含函数的参数。在这里，没有任何参数 - 所以我们使用空的括号即可。
+4. `{`表明一个代码块的开始。在这里，代码块是函数的主体。所有在`{`和`}`之间的东西都是函数的内容：其中指令依次执行。代码块(denote)也意味着*作用域* - 因此，你在函数内定义的所有内容均具有该函数的访问权限。也就是说，你在`cheese`函数内部定义了一个变量 - 该变量对`mouse`函数不可见(反之亦然)。解决这种问题有很多办法，我们将在构建游戏时对其进行介绍。
+5. `println!`是一个*宏*。你可以判断Rust宏因为它们名称后面都有一个`!`。你可以在[这里](https://kaisery.github.io/trpl-zh-cn/ch19-06-macros.html)学到关于宏的内容。而现在，你只需要知道它们是一种特殊的函数，可以在编译期间解析成其他的代码。打印内容输出到屏幕可以变得十分复杂 - 你可能想要表达更多内容而不仅仅是“hello world” - `println!`宏涵盖了大量的格式化的用例。(如果你对C++很熟悉，它相当于`std::fmt`。由于程序员往往不得不输出大量文本，大部分语言都有它们自己的字符串格式化系统!)
+6. 最后`}`关闭在`4`上开始的代码块。
 
-Go ahead and type `cargo run`. After some compilation, if everything is working you will be greeted with "Hello World" on your terminal.
+继续并输入`cargo run`。在一番编译之后，如果一切正常，你将会在终端上看到“hello world”。
 
-### Useful `cargo` commands
+### 有用的`cargo`命令
 
-Cargo is quite the tool! You can learn a bit about it [from the Learn Rust book](https://doc.rust-lang.org/1.2.0/book/hello-cargo.html), and *everything* about it from [The Cargo Book](https://doc.rust-lang.org/cargo/) if you are interested.
+Cargo是一个相当有用的工具！你可以在[rust程序设计](https://kaisery.github.io/trpl-zh-cn/ch01-03-hello-cargo.html)中学到一些关于它的内容，如果你很感兴趣的话，也可以在[Cargo指南](https://doc.rust-lang.org/cargo/index.html)中学到关于它的所有内容。
 
-You'll be interacting with `cargo` a *lot* while you work in Rust. If you initialize your program with `cargo init`, your program is a cargo *crate*. Compilation, testing, running, updating - Cargo can help you with all of it. It even sets up `git` for you by default.
+当你在用Rust工作时，你会多次与`cargo`进行交互。如果你使用`cargo init`初始化你的项目，你的项目将会是一个cargo *crate*。编译，测试，执行，更新 - Cargo都可以帮助你做到。它甚至可以默认的为你设置`git`。
 
-You may find the following `cargo` features handy:
+你可以在`cargo`中发现下面这些比较方便的特性：
 
-* `cargo init` creates a new project. That's what you used to make the hello world program. If you *really* don't want to be using `git`, you can type `cargo init --vcs none (projectname)`.
-* `cargo build` downloads all dependencies for a project and compiles them, and then compiles your program. It doesn't actually *run* your program - but this is a good way to quickly find compiler errors.
-* `cargo update` will fetch new versions of the *crates* you listed in your `cargo.toml` file (see below).
-* `cargo clean` can be used to delete *all* of the intermediate work files for your project, freeing up a bunch of disk space. They will automatically download and recompile the next time you run/build your project. Occasionally, a `cargo clean` can help when things aren't working properly - particularly IDE integration.
-* `cargo verify-project` will tell you if your Cargo settings are correct.
-* `cargo install` can be used to install programs via Cargo. This is helpful for installing tools that you need.
+* `cargo init` 创建一个新的项目。creates a new project. 那就是你用来创建`hello world`项目的命令。如果你真的想使用`git`，你可以输入`cargo init --vcs none (projectname)`。
+* `cargo build` 下载项目中所有的依赖并编译他们，然后再编译你的程序。它不会真的运行你的程序 - 但是这是一种可以快速发现程序中编译错误的方式。
+* `cargo update` 将会拉下在`cargo.toml`文件中*crate*清单的最新版本。
+* `cargo clean` 可用于删除项目中所有的中间工作文件，从而释放大量磁盘空间。下次你运行/构建项目时，它们会自动下载并重新编译。有时，当项目无法正常工作时，执行`cargo clean`可能会有用 - 尤其是IDE集成开发环境。
+* `cargo verify-project` 将会告诉你Cargo的配置是否正确。
+* `cargo install` 被用来通过Cargo来安装程序。这对安装一些需要的工具来说十分有用。
 
-Cargo also supports *extensions* - that is, plugins that make it do even more. There are some that you may find particularly useful:
+Cargo也支持扩展 - 也就是说，插件可以让它做更多的事情。这里有一些插件你可能会觉得很有用：
 
-* Cargo can reformat all your source code to look like standard Rust from the Rust manuals. You need to type `rustup component add rustfmt` *once* to install the tool. After that's done, you can type `cargo fmt` to format your code at any time.
-* If you'd like to work with the `mdbook` format - used for [this book](https://github.com/thebracket/rustrogueliketutorial)! - cargo can help with that, too. Just once, you need to run `cargo install mdbook` to add the tools to your system. After that, `mdbook build` will build a book project, `mdbook init` will make a new one, and `mdbook serve` will give you a local webserver to view your work! You can learn all about `mdbook` [on their documentation page](https://rust-lang-nursery.github.io/mdBook/cli/index.html).
-* Cargo can also integrate with a "linter" - called `Clippy`. Clippy is a little pedantic (just like his Microsoft Office namesake!). Just the once, run `rustup component add clippy`. You can now type `cargo clippy` at any time to see suggestions for what may be wrong with your code!
+* Cargo可以格式化你的所有代码，让它看起来像Rust手册中的标准Rust代码一样。你需要输入一次`rustup component add rustfmt`来安装这个工具。 当安装结束之后，你在任何时候都可以输入`cargo fmt`来格式化你的代码。
+* 如果你想要使用`mdbook`的格式 - 正如[this book](https://github.com/thebracket/rustrogueliketutorial)所用的一样! - cargo同样可以帮你。你需要执行`cargo install mdbook`来添加该工具到你的系统环境中。然后使用`mdbook build`将会构建一个文档项目，`mdbook init`将会创建一个新的文档项目，`mdbook serve`将会提供一个本地的web服务来展示你的工作! 你可以从[mdbook](https://rust-lang-nursery.github.io/mdBook/cli/index.html)学习相关的内容。
+* Cargo也可以集成一个代码校验工具 - 叫做`Clippy`。Clippy有点学术性(就像微软的office中和它同名的工具一样!). 仅需执行`rustup component add clippy`一次，你就可以在任何时候输入`cargo clippy`来查看有关你的代码中可能有什么问题的建议!
 
 
-### Making a new project
+### 创建一个新项目
 
-Lets modify the newly created "hello world" project to make use of [RLTK](https://github.com/thebracket/bracket-lib) - the Roguelike Toolkit.
+让我们修改新创建的项目以使用[RLTK](https://github.com/thebracket/bracket-lib) - Roguelike工具集.
 
-## Setup Cargo.toml
+## 设置Cargo.toml文件
 
-The auto-generated Cargo file will look like this:
+自动生成的Cargo文件开起来像这样：
 
 ```toml
 [package]
@@ -135,20 +135,20 @@ edition = "2018"
 [dependencies]
 ```
 
-Go ahead and make sure that your name is correct! Next, we're going to ask Cargo to use RLTK - the Roguelike toolkit library. Rust makes this very easy. Adjust the `dependencies` section to look like this:
+继续并确定你的名字是正确的！下一步，我们要让Cargo使用RLTK - Roguelike工具集类库。Rust让这个变得非常容易。调整`dependencies`模块，看起来像这样：
 
 ```toml
 [dependencies]
 rltk = { version = "0.8.0" }
 ```
 
-We're telling it that the package is named `rltk`, and is available in Cargo - so we just have to give it a version. You can do `cargo search rltk` to see the latest version at any time, or go to [the crate webpage](https://crates.io/crates/rltk).
+我们告诉它包的名称叫做`rltk`，可以在Cargo中获取到 - 所以我们只需要提供一个版本号。你可以在任何时候执行`cargo search rltk`来查看最新的版本，或者访问[crate网站](https://crates.io/crates/rltk)。
 
-It's a good idea to occasionally run `cargo update` - this will update the libraries used by your program.
+偶尔运行`cargo update`命令是个好主意 - 它将会更新你的项目中使用的类库。
 
-## Hello Rust - RLTK Style!
+## Hello Rust - RLTK风格!
 
-Go ahead and replace the contents of `src\main.rs` with:
+继续并替换`src\main.rs`中的内容：
 
 ```rust
 use rltk::{Rltk, GameState};
@@ -171,19 +171,19 @@ fn main() -> rltk::BError {
 }
 ```
 
-Now create a new folder called `resources`. RLTK needs a few files to run, and this is where we put them. Download [resources.zip](./resources.zip), and unzip it into this folder. Be careful to have `resources/backing.fs` (etc.) and not `resources/resources/backing.fs`.
+现在创建一个新的`resources`文件夹，RLTK运行需要一些文件，我们将这些文件放在这个文件夹中。下载[resources.zip](./resources.zip)，并将其解压在该文件夹中。请注意解压后的文件路径是`resources/backing.fs` (等)而不是`resources/resources/backing.fs`。
 
-Save, and go back to the terminal. Type `cargo run`, and you will be greeted with a console window showing `Hello Rust`.
+保存，然后回到终端。输入`cargo run`，你会在终端窗口看到`Hello Rust`字样。
 
 ![Screenshot](./c1-s1.png)
 
-If you're new to Rust, you are probably wondering what exactly the `Hello Rust` code does, and why it is there - so we'll take a moment to go through it.
+如果你是Rust新手，你可能会疑惑`Hello Rust`代码干了些什么，和这里为什么要这么写 - 所以我们花一点时间浏览一下代码。
 
-1. The first line is equivalent to C++'s `#include` or C#'s `using`. It simply tells the compiler that we are going to require `Rltk` and `GameState` types from the namespace `rltk`. You used to need an additional `extern crate` line here, but the most recent version of Rust can now figure it out for you.
-2. With `struct State{}`, we are creating a new `structure`. Structures are like Records in Pascal, or Classes in many other languages: you can store a bunch of data inside them, and you can also attach "methods" (functions) to them. In this case, we don't actually need any data - we just need a place to attach code. If you'd like to learn more about Structs, [this is the Rust Book chapter on the topic](https://doc.rust-lang.org/book/ch05-00-structs.html)
-3. `impl GameState for State` is quite a mouthful! We're telling Rust that our `State` structure *implements* the *trait* `GameState`. Traits are like interfaces or base classes in other languages: they setup a structure for you to implement in your own code, which can then interact with the library that provides them - without that library having to know anything else about your code. In this case, `GameState` is a trait provided by RLTK. RLTK requires that you have one - it uses it to call into your program on each frame. You can learn about traits [in this chapter of the Rust book](https://doc.rust-lang.org/book/ch10-02-traits.html).
-4. `fn tick(&mut self, ctx : &mut Rltk)` is a *function* definition. We're inside the trait implementation scope, so we are implementing the function *for* the trait - so it *has* to match the type required by the trait. Functions are a basic building block of Rust, I recommend [the Rust book chapter on the topic](https://doc.rust-lang.org/book/ch03-03-how-functions-work.html). 
-    1. In this case, `fn tick` means "make a function, called tick" (it's called "tick" because it "ticks" with each frame that is rendered; it's common in game programming to refer to each iteration as a tick). 
+1. 第一行相当于C++中的`#include`或C#中的`using`。它告诉编译器我们需要命名空间`rltk`中的`Rltk`和`GameState`类型。过去这里你需要添加额外的`extern crate`行，但是最新的Rust版本已经可以理解而不需要你手动添加了。
+2. 使用`struct State{}`，我们创建了一个新的`结构体`。结构体就像是Pascal中的Record，或者其他语言中的Class：你可以在其中存储一堆数据，你也可以在其中添加一些方法。在这里，我们不需要任何数据 - 我们只需要一个可以附加代码的地方。如果你想要学习更多关于结构体的知识，你可以访问[Rust程序设计中的这一章节](https://kaisery.github.io/trpl-zh-cn/ch05-00-structs.html)
+3. `impl GameState for State`有点拗口！我们告诉Rust我们的`State`结构体需要*实现*`GameState`接口。Trait和其他语言中的接口或基类很像：他们设置了一个结构让你可以实现自己的代码，然后可以与他们提供的库进行交互 - 如果没有trait，类库需要知道关于你代码中的所有信息。在这里，`GameState`是一个RLTK提供的trait。RLTK需要你满足一点 - 它在它的每一帧上调用你的程序。你可以在[这里](https://kaisery.github.io/trpl-zh-cn/ch10-02-traits.html)学习trait相关的内容。
+4. `fn tick(&mut self, ctx : &mut Rltk)`是一个函数定义。这里是实现GameState接口的地方，所以我们需要为这个trait实现这个函数 - 它需要匹配trait提供的类型。函数是构建Rust代码块的基础，我推荐[rust程序设计中的这一节]()(https://kaisery.github.io/trpl-zh-cn//ch03-03-how-functions-work.html). 
+    1. 在该例中，`fn tick`意思是“创建一个函数，将其命名为tick”(它被称为“tick”是因为它在渲染的每一帧上都要“滴答”一下，在游戏编程中，通常将每次迭代称为tick)。 
     2. It doesn't end with an `-> type`, so it is equivalent to a `void` function in C - it doesn't return any data once called. The parameters can also benefit from a little explanation. 
     3. `&mut self` means "this function requires access to the parent structure, and may change it" (the `mut` is short for "mutable" - meaning it can change variables inside the structure - "state"). You can also have functions in a structure that just have `&self` - meaning, we can *see* the content of the structure, but can't change it. If you omit the `&self` altogether, the function can't see the structure at all - but can be called as if the structure was a *namespace* (you see this a lot with functions called `new` - they make a new copy of the structure for you).
     4. `ctx: &mut Rltk` means "pass in a variable called `ctx`" (`ctx` is an abbreviation for "context"). The colon indicates that we're specifying what *type* of variable it must be. 
