@@ -6,7 +6,7 @@
 
 *此教程是免费且开源的，所有代码均使用MIT许可证 - 所以你可以随意使用它。我希望你可以享受这个学习的过程，并制作出很棒的游戏。!*
 
-*如果你喜欢这个教程并希望我继续写作，请考虑支持[my Patreon](https://www.patreon.com/blackfuture).*
+*如果你喜欢这个教程并希望我继续写作，请考虑支持 [my Patreon](https://www.patreon.com/blackfuture).*
 
 ---
 
@@ -88,7 +88,7 @@ fn main() {
 2. `main`是函数的*名称*。在这里，这个名称是一种特殊的情况：当操作系统加载一个程序到内存中时，它需要知道它首先应该运行什么 - Rust做了一些额外的工作来标志`main`是第一个需要运行的函数。如果你想要你的程序可以运行起来，通常需要一个`main`函数，除非你开发的是一个*类库*(为其他程序提供的函数集合)。
 3. `()`中包含函数的参数。在这里，没有任何参数 - 所以我们使用空的括号即可。
 4. `{`表明一个代码块的开始。在这里，代码块是函数的主体。所有在`{`和`}`之间的东西都是函数的内容：其中指令依次执行。代码块(denote)也意味着*作用域* - 因此，你在函数内定义的所有内容均具有该函数的访问权限。也就是说，你在`cheese`函数内部定义了一个变量 - 该变量对`mouse`函数不可见(反之亦然)。解决这种问题有很多办法，我们将在构建游戏时对其进行介绍。
-5. `println!`是一个*宏*。你可以判断Rust宏因为它们名称后面都有一个`!`。你可以在[这里](https://kaisery.github.io/trpl-zh-cn/ch19-06-macros.html)学到关于宏的内容。而现在，你只需要知道它们是一种特殊的函数，可以在编译期间解析成其他的代码。打印内容输出到屏幕可以变得十分复杂 - 你可能想要表达更多内容而不仅仅是“hello world” - `println!`宏涵盖了大量的格式化的用例。(如果你对C++很熟悉，它相当于`std::fmt`。由于程序员往往不得不输出大量文本，大部分语言都有它们自己的字符串格式化系统!)
+5. `println!`是一个*宏*。你可以判断Rust宏因为它们名称后面都有一个`!`。你可以在[rust程序设计：宏](https://kaisery.github.io/trpl-zh-cn/ch19-06-macros.html)学到关于宏的内容。而现在，你只需要知道它们是一种特殊的函数，可以在编译期间解析成其他的代码。打印内容输出到屏幕可以变得十分复杂 - 你可能想要表达更多内容而不仅仅是“hello world” - `println!`宏涵盖了大量的格式化的用例。(如果你对C++很熟悉，它相当于`std::fmt`。由于程序员往往不得不输出大量文本，大部分语言都有它们自己的字符串格式化系统!)
 6. 最后`}`关闭在`4`上开始的代码块。
 
 继续并输入`cargo run`。在一番编译之后，如果一切正常，你将会在终端上看到“hello world”。
@@ -180,14 +180,14 @@ fn main() -> rltk::BError {
 如果你是Rust新手，你可能会疑惑`Hello Rust`代码干了些什么，和这里为什么要这么写 - 所以我们花一点时间浏览一下代码。
 
 1. 第一行相当于C++中的`#include`或C#中的`using`。它告诉编译器我们需要命名空间`rltk`中的`Rltk`和`GameState`类型。过去这里你需要添加额外的`extern crate`行，但是最新的Rust版本已经可以理解而不需要你手动添加了。
-2. 使用`struct State{}`，我们创建了一个新的`结构体`。结构体就像是Pascal中的Record，或者其他语言中的Class：你可以在其中存储一堆数据，你也可以在其中添加一些方法。在这里，我们不需要任何数据 - 我们只需要一个可以附加代码的地方。如果你想要学习更多关于结构体的知识，你可以访问[Rust程序设计中的这一章节](https://kaisery.github.io/trpl-zh-cn/ch05-00-structs.html)
-3. `impl GameState for State`有点拗口！我们告诉Rust我们的`State`结构体需要*实现*`GameState`接口。Trait和其他语言中的接口或基类很像：他们设置了一个结构让你可以实现自己的代码，然后可以与他们提供的库进行交互 - 如果没有trait，类库需要知道关于你代码中的所有信息。在这里，`GameState`是一个RLTK提供的trait。RLTK需要你满足一点 - 它在它的每一帧上调用你的程序。你可以在[这里](https://kaisery.github.io/trpl-zh-cn/ch10-02-traits.html)学习trait相关的内容。
-4. `fn tick(&mut self, ctx : &mut Rltk)`是一个函数定义。这里是实现GameState接口的地方，所以我们需要为这个trait实现这个函数 - 它需要匹配trait提供的类型。函数是构建Rust代码块的基础，我推荐[rust程序设计中的这一节]()(https://kaisery.github.io/trpl-zh-cn//ch03-03-how-functions-work.html). 
+2. 使用`struct State{}`，我们创建了一个新的`结构体`。结构体就像是Pascal中的Record，或者其他语言中的Class：你可以在其中存储一堆数据，你也可以在其中添加一些方法。在这里，我们不需要任何数据 - 我们只需要一个可以附加代码的地方。如果你想要学习更多关于结构体的知识，你可以访问[Rust程序设计：结构体](https://kaisery.github.io/trpl-zh-cn/ch05-00-structs.html)
+3. `impl GameState for State`有点拗口！我们告诉Rust我们的`State`结构体需要*实现*`GameState`接口。Trait和其他语言中的接口或基类很像：他们设置了一个结构让你可以实现自己的代码，然后可以与他们提供的库进行交互 - 如果没有trait，类库需要知道关于你代码中的所有信息。在这里，`GameState`是一个RLTK提供的trait。RLTK需要你满足一点 - 它在它的每一帧上调用你的程序。你可以在[rust程序设计：trait](https://kaisery.github.io/trpl-zh-cn/ch10-02-traits.html)学习trait相关的内容。
+4. `fn tick(&mut self, ctx : &mut Rltk)`是一个函数定义。这里是实现GameState接口的地方，所以我们需要为这个trait实现这个函数 - 它需要匹配trait提供的类型。函数是构建Rust代码块的基础，我推荐[rust程序设计：函数是如何工作的](https://kaisery.github.io/trpl-zh-cn//ch03-03-how-functions-work.html). 
     1. 在该例中，`fn tick`意思是“创建一个函数，将其命名为tick”(它被称为“tick”是因为它在渲染的每一帧上都要“滴答”一下，在游戏编程中，通常将每次迭代称为tick)。 
     2. 它并没有以`-> type`作为结束，所以它相当于C语言中的`void`函数 - 它一旦被调用不会返回任何值。 该函数的参数也可以从一些解释中收益。
     3. `&mut self`意味着“该函数需要访问结构体State，并且可能会修改他” (`mut`是“mutable”的简写 - 表示它可以修改结构体中的变量 - “state”)。 结构体中的函数也可以只包含`&self` - 意思是，我们可以看到结构体的内容，但是不会修改它。如果你忽略了`&self`，函数将无法查看结构体中的内容 - 但是可以被调用，仿佛结构体就是一个命名空间一样。(你可以经常看到这种名为`new`的函数 - 它们为你提供了该结构体的副本 - `State::new()`).
     4. `ctx: &mut Rltk`意思是“传入了一个名为`ctx`的变量" (`ctx`是“context”的缩写). 冒号表示我们为这个变量指定了类型。
-    5. `&`意思是“传入了一个引用” - 这是指向变量现有副本的指针。该变量没有被复制，你正在处理传入的版本；如果你做了修改，你也会修改原件。[rust程序设计解释的比我要好](https://kaisery.github.io/trpl-zh-cn/ch04-02-references-and-borrowing.html).
+    5. `&`意思是“传入了一个引用” - 这是指向变量现有副本的指针。该变量没有被复制，你正在处理传入的版本；如果你做了修改，你也会修改原件。[rust程序设计：引用和借用](https://kaisery.github.io/trpl-zh-cn/ch04-02-references-and-borrowing.html)解释的比我要好。
     6. `mut`再一次表示它是一个可变引用：你被允许去修改上下文。
     7. 最后`Rltk`是你将接收到的变量类型。在此例中，它是`RLTK`库中定义的结构体，它提供了你可以在屏幕上执行的各种操作。
 5. `ctx.cls();`是指“调用变量`ctx`提供的`cls`函数“。`cls`是“clear the screen”的缩写 - 我们告诉上下文应该清空虚拟终端。在某一帧的最开始执行这个方法是个明智的选择，除非你确实不想这么做。
@@ -200,7 +200,7 @@ fn main() -> rltk::BError {
         .build()?;
    ```
    是在结构体内调用一个函数的例子 - 该函数并没有携带“self”。在其他语言中，这可能会被称为构造函数。我们将该函数称为`simple80x50` (它是RLTK提供的结构体，可以使终端有80个字节的宽度，50个字节的高度，窗口的标题为“Roguelike Tutorial”。
-9. `let gs = State{ };`是一个变量分配的例子(请查看[The Rust Book](https://kaisery.github.io/trpl-zh-cn/ch03-01-variables-and-mutability.html))。我们创建了一个新的变量叫做`gs`(“game state”的简称)，并将其赋值为上面定义的`State`结构体的副本。
+9. `let gs = State{ };`是一个变量分配的例子(请查看[rust程序设计：变量和可变性](https://kaisery.github.io/trpl-zh-cn/ch03-01-variables-and-mutability.html))。我们创建了一个新的变量叫做`gs`(“game state”的简称)，并将其赋值为上面定义的`State`结构体的副本。
 10. `rltk::main_loop(context, gs)`在命令空间`rltk`内被调用，激活了一个叫做`main_loop`的函数。它需要我们之前创建好的`context`和`GameState` - 所以我们将其传过去即可。RLTK尝试去除一些运行GUI/游戏应用程序的某些复杂性，并提供一些包装。现在该函数将接管并控制程序，并在每次程序“滴答”时调用`tick`函数 - 也就是说，一个周期结束将会进入下一个周期，每秒钟可以发生60甚至更多次。
 
 希望这些解释将起到一些用处！
@@ -246,7 +246,7 @@ cargo run
 如果你使用了*Visual Studio Code*，你可以使用*File -> Open Folder*打开你已检查过的整个目录。使用终端内置的命令，你可以`cd`到每个教程中并执行`cargo run`。
 ## 获取教程源码
 
-You can get to the source code for all of the tutorials at [https://github.com/thebracket/rustrogueliketutorial](https://github.com/thebracket/rustrogueliketutorial).
+你可以在[https://github.com/thebracket/rustrogueliketutorial](https://github.com/thebracket/rustrogueliketutorial)获取所有教程的源码。
 
 ## 更新教程
 
