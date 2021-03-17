@@ -29,13 +29,13 @@ BaseEntity
 
 你可能会遇到比这更复杂的事情，但这只是一个例证。`BaseEntity`将包含显示在地图上的实体所需的代码和数据，`Monster`暗示他是一个坏家伙，`MeleeMob`将会保持寻找近战目标的逻辑，接近并消灭他们。同样，`ArcherMob`会尝试维持最佳射程(optimal range)并使用远程武器在安全距离处射击。 问题是这样分类(taxonomy)可能是具有限制性的，在你知道之前 - 你就已经开始为更加复杂的组合编写单独的类。举个例子，如果我们想出一个可以同时近战(melee)和射箭(archery)的兽人(orc) - 并且在你完成了*Friends With The Greenskins*任务后，可能变得友善? 你可能最终会将这些逻辑组合成一个特例类。这确实有用 - 并且大量的游戏也都是这样做的 - 但是这里还有一种更简单的方式吗？
 
-基于实体组件的设计试图消除(eliminate)层次结构(hierarchy)，取而代之的是实现一套“组件”来描述你想要的东西。“实体”是一个事物 - 可以是任何事物，真的。一只兽人，一匹狼，一瓶药水(potion)，一个由硬件驱动的空灵幽魂 - 无论你想要什么。 It's also really simple: little more than an identification number. The magic comes from entities being able to have as many *components* as you want to add. Components are just data, grouped by whatever properties you want to give an entity.
+基于实体组件的设计试图消除(eliminate)层次结构(hierarchy)，取而代之的是实现一套“组件”来描述你想要的东西。“实体”是一个事物 - 可以是任何事物，真的。一只兽人，一匹狼，一瓶药水(potion)，一个由硬件驱动的空灵幽魂 - 无论你想要什么。这十分简单：仅仅是一个可标识的数字。来自实体的魔法可以添加任意数量的*组件*。组件即数据，按照赋予实体的属性分组。
 
-For example, you could build the same set of mobs with components for: `Position`, `Renderable`, `Hostile`, `MeleeAI`, `RangedAI`, and some sort of CombatStats component (to tell you about their weaponry, hit points, etc.). An Orc Warrior would need a position so you know where they are, a renderable so you know how to draw them. It's Hostile, so you mark it as such. Give it a MeleeAI and a set of game stats, and you have everything you need to make it approach the player and try to hit them. An Archer might be the same thing, but replacing MeleeAI with RangedAI. A hybrid could keep all the components, but either have both AIs or an additional one if you want custom behavior. If your orc becomes friendly, you could remove the Hostile component - and add a Friendly one.
+举个例子，你可以使用以下组件来构建同一组战士：`位置`，`渲染`，`敌对`，`近战AI`，`远程AI`，和某些战斗统计的组件(来告诉你关于他们的武器，命中率(hit point)等信息)。 兽人战士需要一个位置以便你能够知道他们在哪儿，他们是可渲染的因此你知道如何绘制他们。他充满敌意，因此将他标记为敌对状态。给他提供一个近战AI和一套游戏统计数据，然后你就拥有了你需要的一切，可以让他接近玩家并攻击他们。射手同理，只不过将远程AI替换了近战AI。一个杂交体可以持有所有的组件，如果你想要自定义行为，则可以同时拥有两个AI或其他类型的AI。如果你的兽人变得友好，你可以移除他的敌对组件，并添加一个友善组件。
 
-In other words: components are just like your inheritance tree, but instead of *inheriting* traits you *compose* them by adding components until it does what you want. This is often called "composition".
+换句话说，组件就像是你的继承树，但是你不是通过继承trait而是通过添加组件来进行组合，直到达到了你的期望为止。这经常被称为“组合”。
 
-The "S" in ECS stands for "Systems". A *System* is a piece of code that gathers data from the entity/components list and does something with it. It's actually quite similar to an inheritance model, but in some ways it's "backwards". For example, drawing in an OOP system is often: *For each BaseEntity, call that entity's Draw command*. In an ECS system, it would be *Get all entities with a position and a renderable component, and use that data to draw them*.
+ECS中的“S”代表“系统”。A *System* is a piece of code that gathers data from the entity/components list and does something with it. It's actually quite similar to an inheritance model, but in some ways it's "backwards". For example, drawing in an OOP system is often: *For each BaseEntity, call that entity's Draw command*. In an ECS system, it would be *Get all entities with a position and a renderable component, and use that data to draw them*.
 
 For small games, an ECS often feels like it's adding a bit of extra typing to your code. It is. You take the additional work up front, to make life easier later.
 
