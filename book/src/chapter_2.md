@@ -27,25 +27,26 @@ BaseEntity
             OrcArcher
 ```
 
-你可能会遇到比这更复杂的事情，但这只是一个例证。`BaseEntity`将包含显示在地图上的实体所需的代码和数据，`Monster`暗示他是一个坏家伙，`MeleeMob`将会保持寻找近战目标的逻辑，接近并消灭他们。同样，`ArcherMob`会尝试维持最佳射程(optimal range)并使用远程武器在安全距离处射击。 问题是这样分类(taxonomy)可能是具有限制性的，在你知道之前 - 你就已经开始为更加复杂的组合编写单独的类。举个例子，如果我们想出一个可以同时近战(melee)和射箭(archery)的兽人(orc) - 并且在你完成了*Friends With The Greenskins*任务后，可能变得友善? 你可能最终会将这些逻辑组合成一个特例类。这确实有用 - 并且大量的游戏也都是这样做的 - 但是这里还有一种更简单的方式吗？
+你可能会遇到比这更复杂的事情，但这只是一个例证。`BaseEntity`将包含显示在地图上的实体所需的代码和数据，`Monster`暗示他是一个坏家伙，`MeleeMob`将会保持寻找近战目标的逻辑，接近并消灭他们。同样，`ArcherMob`会尝试维持最佳射程 (optimal range) 并使用远程武器在安全距离处射击。 问题是这样分类 (taxonomy) 可能是具有限制性的，在你知道之前 - 你就已经开始为更加复杂的组合编写单独的类。举个例子，如果我们想出一个可以同时近战 (melee) 和射箭 (archery) 的兽人 (orc) - 并且在你完成了 *Friends With The Greenskins* 任务后，可能变得友善? 你可能最终会将这些逻辑组合成一个特例类。这确实有用 - 并且大量的游戏也都是这样做的 - 但是这里还有一种更简单的方式吗？
 
-基于实体组件的设计试图消除(eliminate)层次结构(hierarchy)，取而代之的是实现一套“组件”来描述你想要的东西。“实体”是一个事物 - 可以是任何事物，真的。一只兽人，一匹狼，一瓶药水(potion)，一个由硬件驱动的空灵幽魂 - 无论你想要什么。这十分简单：仅仅是一个可标识的数字。来自实体的魔法可以添加任意数量的*组件*。组件即数据，按照赋予实体的属性分组。
+基于实体组件的设计试图消除 (eliminate) 层次结构 (hierarchy)，取而代之的是实现一套“组件”来描述你想要的东西。“实体”是一个事物 - 可以是任何事物，真的。一只兽人，一匹狼，一瓶药水 (potion)，一个由硬件驱动的空灵幽魂 - 无论你想要什么。这十分简单：仅仅是一个可标识的数字。来自实体的魔法可以添加任意数量的*组件*。组件即数据，按照赋予实体的属性分组。
 
 举个例子，你可以使用以下组件来构建同一组战士：`位置`，`渲染`，`敌对`，`近战AI`，`远程AI`，和某些战斗统计的组件(来告诉你关于他们的武器，命中率(hit point)等信息)。 兽人战士需要一个位置以便你能够知道他们在哪儿，他们是可渲染的因此你知道如何绘制他们。他充满敌意，因此将他标记为敌对状态。给他提供一个近战AI和一套游戏统计数据，然后你就拥有了你需要的一切，可以让他接近玩家并攻击他们。射手同理，只不过将远程AI替换了近战AI。一个杂交体可以持有所有的组件，如果你想要自定义行为，则可以同时拥有两个AI或其他类型的AI。如果你的兽人变得友好，你可以移除他的敌对组件，并添加一个友善组件。
 
 换句话说，组件就像是你的继承树，但是你不是通过继承trait而是通过添加组件来进行组合，直到达到了你的期望为止。这经常被称为“组合”。
 
-ECS中的“S”代表“系统”。A *System* is a piece of code that gathers data from the entity/components list and does something with it. It's actually quite similar to an inheritance model, but in some ways it's "backwards". For example, drawing in an OOP system is often: *For each BaseEntity, call that entity's Draw command*. In an ECS system, it would be *Get all entities with a position and a renderable component, and use that data to draw them*.
+ECS 中的“S”代表“系统”。*系统*是一段代码，可以从实体/组件列表中收集数据并对其进行处理。实际上它与继承模型非常类似，但在某些方面它是“向后”的。举个例子，在OOP系统中进行绘制通常是：*调用每一个实体的绘制命令*。在ECS系统中，它却是*获取所有具有位置信息和可渲染组件的实体，然后使用该数据绘制它们*。
 
-For small games, an ECS often feels like it's adding a bit of extra typing to your code. It is. You take the additional work up front, to make life easier later.
+对于小游戏，ECS感觉就像是在你的代码中添加了一些额外的的输入。你需要预先进行其他的工作，以使得以后的生活更加轻松。
 
-That's a lot to digest, so we'll look at a simple example of how an ECS can make your life a bit easier.
+有太多东西需要消化，让我们来看一个小例子，ECS 是如何让你的生活更加轻松的。
 
-It's important to know that ECS is just one way of handling composition. There are many others, and there really is no right answer. With a bit of searching, you can find a bunch of different ways to approach ECS. There's plenty of object-oriented approaches. There are plenty of "free function" approaches. They all have merit, and can work for you. I've gone with the Entity-Component approach in this book, but there are *many* other ways to skin the cat. As you gain experience, you'll find one that's comfortable for you! My advice: if anyone tells you that a particular method is the "right" one, ignore them - programming is the art of making something that works, rather than a quest for purity!
+重要的是要知道ECS仅仅是处理组合的一种方式。还有很多其他的方式，实际上这里也有没有正确的答案。通过一些搜索，你可以找到许多不同的方式来接触ECS。这里有大量的面向对象的方法，也有许多“免费的功能”，它们都有各自的优点 (merit)，并为你所用。在这本书中，我已经使用了实体-组件的这种方式，但还是有许多其他的方式给猫剥皮。随着经验的积累，你会发现一种适合自己的方式！我的建议是：如果任何人告诉你某一个特定的方法式“正确的”，直接无视他 - 编程是一种让某些事物行之有效的艺术，而不是追求纯粹！
 
-## Including Specs in the project
+## 在项目中添加Specs
 
-To start, we want to tell Cargo that we're going to use Specs. Open your `Cargo.toml` file, and change the `dependencies` section to look like this:
+为了开始，我们需要告诉 Cargo 我们打算使用 Specs。打开你的`Cargo.toml`文件，将`dependencies`部分修改成如下所示：
+
 ```toml
 [dependencies]
 rltk = { version = "0.8.0" }
@@ -53,9 +54,10 @@ specs = "0.16.1"
 specs-derive = "0.4.1"
 ```
 
-This is pretty straightforward: we're telling Rust that we still want to use RLTK, and we're also asking for specs (the version number is current at the time of writing; you can check for new ones by typing `cargo search specs`). We're also adding `specs-derive` - which provides some helper code to reduce the amount of boilerplate typing you have to do.
+这非常直接了当：我们告诉 Rust 我们仍然想要使用 RLTK，并且我们还想要使用 specs (版本号在在撰写本文时是最新的，你可以通过输入`cargo search specs`来检查是否有更新的版本). 我们也添加了`specs-derive` - 它提供了一些帮助性的代码，可以减少你必须输入的样板代码的数量。
 
-At the top of `main.rs` we add a few lines of code:
+在`main.rs`的最顶部我们添加了几行代码：
+
 ```rust
 use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
 use specs::prelude::*;
@@ -63,17 +65,17 @@ use std::cmp::{max, min};
 use specs_derive::Component;
 ```
 
-`use rltk::` is shorthand; you *can* type `rltk::Console` every time you want a console; this tells Rust that we'd like to just type `Console` instead. Likewise the `use specs::prelude::*` line is there so we aren't continually typing `specs::prelude::World` when we just want `World`.
+`use rltk::`是一个速记；每当你想要一个控制台 (console) 你可以输入`rltk::Console`；这告诉 Rust 我们只是想要`Console`类型。与之相同的是，使用`use specs::prelude::*`后，当我们想要`World`类型时，我们就不需要输入`specs::prelude::World`。
 
-> Old Rust required a scary looking `macro_use` call. You don't need that anymore: you can just directly use the macro.
+> 旧版 Rust 需要一个看起来十分可怕的`macro_use`调用。如今你再也不需要了：你可以直接使用对应的宏。
 
-We need the derivations from Specs' derive component: so we add `use specs_derive::Component;`.
+我们需要派生自 Specs 的派生组件：因此我们添加`use specs_derive::Component;`。
 
-## Defining a position component
+## 定义一个位置组件
 
-We're going to build a little demo that uses an ECS to put characters on the screen and move them around. A basic part of this is to define a `position` - so that entities know where they are. We'll keep it simple: positions are just an X and Y coordinate on the screen.
+我们将构建一个小示例，该示例使用ECS将字符打印在屏幕上并四处移动。这一部分的基础是定义一个`position` - 以便实体可以知道他们的方位。我们使其尽可能简单：位置仅仅是在屏幕上的X，Y坐标。
 
-So, we define a `struct` (these are like structs in C, records in Pascal, etc. - a group of data stored together. See [the Rust Book chapter on Structures](https://doc.rust-lang.org/book/ch05-00-structs.html)):
+我们定义一个`结构体` (有点类似C语言中的结构体 - 一组数据集中存储，参阅 [Rust程序设计](https://kaisery.github.io/trpl-zh-cn/ch05-00-structs.html)):
 
 ```rust
 struct Position {
@@ -82,9 +84,9 @@ struct Position {
 }
 ```
 
-Very simple! A `Position` component has an x and y coordinate, as 32-bit integers. Our `Position` structure is what is known as a `POD` - short for "plain old data". That is, it is *just* data, and doesn't have any logic of its own. This is a common theme with "pure" ECS (Entity Component System) components: they are just data, with no associated logic. The logic will be implemented elsewhere. There are two reasons to use this model: it keeps all of your code that *does something* in "systems" (that is, code that runs across components and entities), and performance - it's *very* fast to keep all of the positions next to each other in memory with no redirects.
+非常简单！一个`位置`组件拥有X，Y坐标(32位整型)。我们的`位置`结构体就是所谓的`POD` - “plain old data”的简写。也就是说，它*仅仅*是数据，不包含任何的逻辑。这是“纯” ECS (Entity Component System)组件的共同主题：它们仅仅是数据，不携带任何逻辑。逻辑将会在其他地方实现。使用这种模型有两个原因：它在“系统”中保留了你所有的*工作*代码(在实体与组件之间运行的代码)以及性能 - 它将所有位置彼此之间的关系保存在内存中的速度非常快速，且没有跳转。
 
-At this point, you could use `Position`s, but there's very little to help you store them or assign them to anyone - so we need to tell Specs that this is a component. Specs provides a *lot* of options for this, but we want to keep it simple. The long-form (no `specs-derive` help) would look like this:
+此时，你就可以使用`Position`了，但是这里还没有什么可以帮助你存储它们或把它们分配给其他人 - 所以我们需要告诉 Specs 这是一个组件。Specs为它提供了很多选择，但是我们希望它能够保持简单，长期来看(没有`specs-derive`的帮助) 它看起来如下所示：
 
 ```rust
 struct Position {
@@ -97,7 +99,7 @@ impl Component for Position {
 }
 ```
 
-You will probably have a *lot* of components by the time your game is done - so that's a lot of typing. Not only that, but it's lots of typing the same thing over and over - with the potential to get confusing. Fortunately, `specs-derive` provides an easier way. You can replace the previous code with:
+当你的游戏开发完成后你可能会拥有很多组件 - so that's a lot of typing. Not only that, but it's lots of typing the same thing over and over - with the potential to get confusing. Fortunately, `specs-derive` provides an easier way. You can replace the previous code with:
 
 ```rust
 #[derive(Component)]
