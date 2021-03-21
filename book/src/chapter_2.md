@@ -99,7 +99,7 @@ impl Component for Position {
 }
 ```
 
-当你的游戏开发完成后你可能会拥有很多组件 - so that's a lot of typing. Not only that, but it's lots of typing the same thing over and over - with the potential to get confusing. Fortunately, `specs-derive` provides an easier way. You can replace the previous code with:
+当你的游戏开发完成后你可能会拥有很多组件 - 所以你可能需要输入很多代码。不仅如此，你可能还会输入很多重复的代码 - 可能会造成混乱。幸运的是，`specs-derive`提供了一种简单的方式。你可以将之前的代码替换成：
 
 ```rust
 #[derive(Component)]
@@ -109,11 +109,11 @@ struct Position {
 }
 ```
 
-What does this do? `#[derive(x)]` is a *macro* that says "from my basic data, please derive the boilerplate needed for *x*"; in this case, the *x* is a `Component`. The macro generates the additional code for you, so you don't have to type it in for every component. It makes it nice and easy to use components! The `#[macro_use] use specs_derive::Component;` from earlier is making use of this; *derive macros* are a special type of macro that implements additional functionality for a structure on your behalf - saving lots of typing.
+它做了什么？`#[derive(x)]`是一个宏，它表示“请根据我的基础数据，派生出*x*的所需的样板”；在这里，*x*是一个`Component`。宏会为你生成额外的代码，因此你不需要为每一个组件都输入这些代码。它让使用组件变得美好而简单！在这之前使用的是`#[macro_use] use specs_derive::Component;`。*派生宏*是一种特殊的宏，它代表你为结构体实现了一些额外的功能 - 减少了很多代码输入。
 
-## Defining a renderable component
+## 定义一个渲染组件
 
-A second part of putting a character on the screen is *what character should we draw, and in what color?* To handle this, we'll create a second component - `Renderable`. It will contain a foreground, background, and glyph (such as `@`) to render. So we'll create a second component structure:
+在屏幕上打印字符的第二部分，*我们应该绘制什么字符，用哪一种颜色呢？*。为了解决这个问题，我们将会创建第二个组件 - `Renderable`。 它将包含要渲染的前景，背景和字形(比如`@`)。该组件的结构如下所示：
 
 ```rust
 #[derive(Component)]
@@ -124,13 +124,13 @@ struct Renderable {
 }
 ```
 
-`RGB` comes from RLTK, and represents a color. That's why we have the `use rltk::{... RGB}` statement - otherwise, we'd be typing `rltk::RGB` every time there - saving keystrokes. Once again, this is a *plain old data* structure, and we are using the *derive* macro to add the component storage information without having to type it all out.
+`RGB`来自RLTK，它代表一种颜色。这就是为什么我们需要使用`use rltk::{... RGB}`语句 - 否则，我们每一次都需要输入`rltk::RGB` - 为了减少敲击键盘的次数。再一次，这是一个*POD*结构，我们使用*derive*宏来添加组件的存储信息，而不是将它们的代码再写一遍。
 
-## Worlds and Registration
+## 世界与注册
 
-So now we have two component types, but that's not very useful without somewhere to put them! Specs requires that you *register* your components at start-up. What do you register it with? A `World`!
+现在我们有了两个组件类型，如果不在某些地方使用，它们将没有用武之地！Specs需要你在一开始就将组件注册上。你用什么注册呢？使用`World`！
 
-A `World` is an ECS, provided by the Rust crate `Specs`. You can have more than one if you want, but we won't go there yet. We'll extend our `State` structure to have a place to store the world:
+一个`World`是一个 ECS，由 Rust的`Specs`库提供。如果你想你可以拥有多个`World`，但是这里我们就不这样了。我们将扩展`State`结构，让 world 可以在其中存储。
 
 ```rust
 struct State {
@@ -138,7 +138,7 @@ struct State {
 }
 ```
 
-And now in `main`, when we create the world - we'll put an ECS into it:
+现在，当我们创建了一个 world，我们就会将一个 ECS 放进`main`函数中。
 
 ```rust
 let mut gs = State {
@@ -146,21 +146,22 @@ let mut gs = State {
 };
 ```
 
-Notice that `World::new()` is another *constructor* - it's a method inside the `World` type, but without a reference to `self`. So it doesn't work on existing `World` objects - it can only make new ones. This is a pattern used everywhere in Rust, so it's a good idea to be familiar with it. [The Rust Book has a section on the topic](https://doc.rust-lang.org/book/ch05-03-method-syntax.html).
+注意到`World::new()`是另一个*构造函数* - 它是`World`类型的一个方法，但是却没有`self`的引用。所以它无法在已存在的`World`对象上工作 - 它唯一能做的就是创建一个新的对象。这是 Rust 中随处可见的一种使用方式，所以尽快熟悉它是一个好主意T。参阅[rust程序设计](https://kaisery.github.io/trpl-zh-cn/ch05-03-method-syntax.html).
 
-The next thing to do is to tell the ECS about the components we have created. We do this right after we create the world:
+下一件事就是要告诉 ECS 我们已经创建了组件。在我们创建完 world 之后，需要立即这么做：
+
 ```rust
 gs.ecs.register::<Position>();
 gs.ecs.register::<Renderable>();
 ```
 
-What this does is it tells our `World` to take a look at the types we are giving it, and do some internal magic to create storage systems for each of them. Specs has made this easy; so long as it implements `Component`, you can put anything you like in as a component!
+它的作用是告诉 `World` 我们提供的类型已经可以使用了，并做一些魔术来为每一种类型创建一个存储系统。Specs让这些变得很简单；只要它实现了`Component`，你就可以将你喜欢的任何东西作为一个组件！
 
-## Creating entities
+## 创建实体
 
-Now we've got a `World` that knows how to store `Position` and `Renderable` components. Having these components simply *exist* doesn't help us, beyond providing an indication of structure. In order to *use* them, they need to be attached to something in the game. In the ECS world, that something is called an *entity*. Entities are quite simple; they are little more than an identification number, telling the ECS that an entity exists. They can have *any* combination of components attached to them. In this case, we're going to make an *entity* that knows where it is on the screen, and knows how it should be represented on the screen.
+现在我们已经有了`World`并且知道如何存储`Position`和`Renderable`组件了。有了这些组件却不使用，除了让我们知道组件的结构之外，对我们来说无济于事。为了使用它们，它们需要附加在游戏的某些东西上。在 ECS 世界中，这些东西被称为*实体*。实体非常简单；它们不过是一个识别码，告诉 ECS 该实体存在。它们可以附加任何组件的组合。在这里，我们将创建一个*实体*，它可以知道它在屏幕中的位置以及如何在屏幕中展示自己。
 
-We can create an entity with both a `Renderable` and a `Position` component like this:
+我们可以创建一个同时具有`Renderable`和`Position`组件的实体：
 
 ```rust
 gs.ecs
@@ -174,11 +175,11 @@ gs.ecs
     .build();
 ```
 
-What this does, is it tells our `World` (`ecs` in `gs` - our game state) that we'd like a new entity. That entity should have a position (we've picked the middle of the console), and we'd like it to be renderable with an `@` symbol in yellow on black. That's very simple; we aren't even storing the entity (we could if we wanted to) - we're just telling the world that it's there!
+它告诉了我们的`World`(`gs`中的`ecs` - 我们的游戏状态)，我们想要一个新的实体，该实体应该有一个位置(我们选择了控制台的中间), 并且我们希望用黄色的`@`符号来渲染它。这非常简单；我们甚至都不用存储实体(如果需要我们可以这样做) - 我们只是在告诉世界它在那里！
 
-Notice that we are using an interesting layout: lots of functions that don't end in an `;` to separate out the end of the statement, but instead lots of `.` calls to another function. This is called the *builder pattern*, and is very common in Rust. Combining functions in this fashion is called *method chaining* (a *method* is a function inside a structure). It works because each function returns a copy of itself - so each function runs in turn, passing itself as the holder for the next method in the *chain*. So in this example, we start with a `create_entity` call - which returns a new, empty, entity. On that entity, we call `with` - which attaches a component to it. That in turn returns the partially built entity - so we can call `with` again to add the `Renderable` component. Finally, `.build()` takes the assembled entity and does the hard part - actually putting together all of the disparate parts into the right parts of the ECS for you.
+注意到我们使用了一个有趣的布局：很多函数并没有以 `;` 作为结尾，而是通过很多的`.`来调用其他的函数。这被称为*建造者*模式，且在 Rust 中十分普遍。这种方式的函数组合被称为*调用链*(*方法*是结构体中的函数)。它起作用是因为每一个函数都返回了它自己的副本 - 所以每个函数依次执行，在*调用链*中将自己作为持有者传递给下一个函数。因此在这个示例中，我们从一个`create_entity`的调用开始 - 该调用返回了一个全新的，空的实体。在该实体中，我们调用`with`函数 - 该函数将组件附加到实体上，然后依次返回部分构建的实体 - 所以我们可以继续调用`call`函数并添加`Renderable`组件。最终，`.build()`接受组装好的实体并完成最困难的一部分 - 将所有不同的部分放在ECS正确的环节并为你提供服务。
 
-You could easily add a bunch more entities, if you want. Lets do just that:
+如果你想要的话，你可以非常方便的添加大量的实体，就像下面一样：
 
 ```rust
 for i in 0..10 {
@@ -194,13 +195,13 @@ for i in 0..10 {
 }
 ```
 
-This is the first time we've called a `for` loop in the tutorial! If you've used other programming languages, the concept will be familiar: run the loop with `i` set to every value from 0 to 9. Wait - 9, you say? Rust ranges are *exclusive* - they don't include the very last number in the range! This is for familiarity with languages like C which normally write `for (i=0; i<10; ++i)`. If you actually *want* to go all the way to the end of the range (so 0 to 10), you would write the rather cryptic `for i in 0..=10`. [The Rust Book provides a great primer for understanding control flow in Rust](https://doc.rust-lang.org/book/ch03-05-control-flow.html).
+这是我们第一次在本教程中调用`for`循环！如果你使用过其他语言，它的概念会非常相似：通过将从0到9的值依次赋予给`i`来执行循。等一等 - 你是说9吗？Rust的循环范围是左闭右开 - 不包含范围中的最后一个值！这和其他语言非常相似，如在C语言中，该for循环通常被写作`for (i=0; i<10; ++i)`。如果你希望一直遍历到范围的结束(即从0到10)，你可以写成`for i in 0..=10`。参阅[rust程序设计](https://kaisery.github.io/trpl-zh-cn/ch03-05-control-flow.html)。
 
-You'll notice that we're putting them at different positions (every 7 characters, 10 times), and we've changed the `@` to an `☺` - a smiley face (`to_cp437` is a helper RLTK provides to let you type/paste Unicode and get the equivalent member of the old DOS/CP437 character set. You could replace the `to_cp437('☺')` with a `1` for the same thing). You can find the glyphs available [here](http://dwarffortresswiki.org/index.php/Character_table).
+你会注意到我将它们放在了不同的位置上(每7个字符设置一次，共10次)，并且我们将 `@`变成了`☺` - 一个笑脸 (`to_cp437`是PLTK提供的帮助工具，它可以让你键入/粘贴Unicode编码并获取旧版DOS/CP437字符集的等效成员。为了做同样的事，你可以使用`1`来替换`to_cp437('☺')`)。你可以参阅[这里](http://dwarffortresswiki.org/index.php/Character_table)来获取可用的字形。
 
-## Iterating entities - a generic render system
+## 遍历实体 - 一个通用的渲染系统
 
-So we now have 11 entities, with differing render characteristics and positions. It would be a great idea to *do something* with that data! In our `tick` function, we replace the call to draw "Hello Rust" with the following:
+现在我们有了11个实体，具有不同的渲染特征和位置。使用这些数据来做一些事情是个好主意！在我们的`tick`函数中，我们将绘制“Hello Rust”的调用替换成如下代码：
 
 ```rust
 let positions = self.ecs.read_storage::<Position>();
@@ -211,32 +212,32 @@ for (pos, render) in (&positions, &renderables).join() {
 }
 ```
 
-What does this do? `let positions = self.ecs.read_storage::<Position>();` asks the ECS for read access to the container it is using to store `Position` components. Likewise, we ask for read access to the `Renderable` storage. It only makes sense to draw a character if it has both of these - you *need* a `Position` to know where to draw, and `Renderable` to know what to draw! You can learn more about these stores in [The Specs Book](https://specs.amethyst.rs/docs/tutorials/01_intro.html). The important part is `read_storage` - we're asking for read-only access to the structure used to store components of each type.
+上面的代码做了什么？`let positions = self.ecs.read_storage::<Position>();`要求 ECS 对其用来存储`Position`组件的容器进行读取访问。同样地，我们也要求读取`Renderable`的存储。如果同时具有这两方面，绘制一个字符才有意义 - 你需要一个`Position`来获取绘制的位置，需要`Renderable`来了解将要绘制的是什么! 你可以在[The Specs Book](https://specs.amethyst.rs/docs/tutorials/01_intro.html)中了解更多关于存储的信息. 重要的一部分是`read_storage` - 我们要求对用于存储每种类型的组件结构进行只读访问。
 
-Fortunately, Specs has our back:
+幸运的是，Specs支持我们：
 
 ```rust
 for (pos, render) in (&positions, &renderables).join() {
 ```
 
-This line says `join` positions and renderables; like a database join, it only returns entities that have both. It then uses Rust's "destructuring" to place each result (one result per entity that has both components). So for each iteration of the `for` loop - you get both components belonging to the same entity. That's enough to draw it!
+这行说的是`join`位置和可渲染对象；就像是数据库中的对象一样，它只能返回同时具有这两种组件的实体。然后使用 Rust 的解构来放置每一个结果(同时具有这两种组件的实体)。因此通过`for`循环进行遍历 - 你将获得属于同一个实体的两种组件。足够进行绘制了。
 
-The `join` function returns an *iterator*. [The Rust Book has a great section on iterators](https://doc.rust-lang.org/book/ch13-02-iterators.html). In C++, iterators provide a `begin`, `next` and `end` function - and you can move between elements in collections with them. Rust extends the same concept, only on steroids: just about anything can be made into an iterator if you put your mind to it. Iterators work very well with `for` loops - you can provide any iterator as the target in `for x in iterator` loops. The `0..10` we discussed earlier really is a *range* - and offers an *iterator* for Rust to navigate.
+`join`函数返回了一个*迭代器*。[rust程序设计](https://kaisery.github.io/trpl-zh-cn/ch13-02-iterators.html)介绍了关于迭代器的相关内容。在C++中，迭代器提供了`begin`，`next`和`end`函数 - 你可以和它们一起在集合中的元素之间运动。Rust 继承了同样的概念：如果你全神贯注的话，几乎所有东西都可以做成迭代器。迭代器可以和`for`一起很好的工作 - 你可以在`for x in iterator`循环中提供迭代器作为目标。早前我们讨论的`0..10`真的是一个*范围 - 并为 Rust提供了一个迭代器来进行导航。
 
-The other interesting thing here are the parentheses. In Rust, when you wrap variables in brackets you are making a *tuple*. These are just a collection of variables, grouped together - but without needing to go and make a structure just for this case. You can access them individually via numeric access (`mytuple.0`, `mytuple.1`, etc.) to get to each field, or you can *destructure* them. `(one, two) = (1, 2)` sets the variable `one` to `1`, and the variable `two` to `2`. That's what we're doing here: the `join` iterator is returning *tuples* containing a `Position` and a `Renderable` component as `.0` and `.1`. Since typing that is ugly and unclear, we *destructure* them into the named variables `pos` and `render`.  This can be confusing at first, so if you are struggling I recommend [Rust By Example's section on Tuples](https://doc.rust-lang.org/rust-by-example/primitives/tuples.html).
+另一个有趣的事情就是这里的括号。在 Rust 中，当你将变量封装在括号中就表示你创建了一个*元组*。元组是一个变量的集合 - 没有必要为这个特例来创建一个结构。你可以通过数字来单独访问它们(`mytuple.0`，`mytuple.1`等)，以获取每一个字段，或者你可以对他们进行解构。`(one, two) = (1, 2)`将变量`one`赋值为`1`，将变量`two`赋值为`2`。那就是我们在这里做的：`join`迭代器返回包含`Position`和`Renderable`组件的元组。因为这么输入不明确且丑陋，我们将其解构成命名的变量`pos`和`render`。初次接触可能会有点疑惑，所以我强烈推荐[Rust By Example's section on Tuples](https://doc.rust-lang.org/rust-by-example/primitives/tuples.html)。
 
 ```rust
 ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
 ```
-We're running this for *every* entity that has *both* a `Position` and a `Renderable` component. The `join` method is passing us both, guaranteed to belong to the same enitity. Any entities that have one or the other - but not both - simply won't be included in the data returned to us.
+我们为每一个包含`Position`和`Renderable`的实体执行这个语句。`join`方法会将它们都传递给我们，并保证属于同一个实体。任何只包含其中之一的实体 - 都不会包含在返回给我们的数据中。
 
-`ctx` is the instance of RLTK passed to us when `tick` runs. It offers a function called `set`, that sets a single terminal character to the glyph/colors of your choice. So we pass it the data from `pos` (the `Position` component for that entity), and the colors/glyph from `render` (the `Renderable` component for that entity).
+`ctx`是当`tick`函数运行时，PLTK传递给我们的实例。它提供了一个`set`方法，它可以将单个命令行字符设置成你选择的字形/颜色。因此我们将`pos`中的数据传递给它(该实体的`Position`组件)，并将`render`中的字形/颜色传递给它(该实体的`Renderable`组件)。
 
-With that in place, *any* entity that has both a `Position` and a `Renderable` will be rendered to the screen! You could add as many as you like, and they will render. Remove one component or the other, and they won't be rendered (for example, if an item is picked up you might remove its `Position` component - and add another indicating that it's in your backpack; more on that in later tutorials)
+有了这个，任何包含`Position`和`Renderable`的实体都将在屏幕中被渲染！你可以添加任意多的实体，它们都会被渲染。移除一个组件或另一个组件，它们就不会被渲染(例如，如果某件物品被捡起，你可能会移除其`Position`组件 - 并添加另一个指示该物品在背包中的组件；在后面的教程中，有更多相关的内容)。
 
-## Rendering - complete code
+## 渲染 - 完整代码
 
-If you've typed all of that in correctly, your `main.rs` now looks like this:
+如果你正确的输入了所有的上述代码，你的`main.rs`文件内容将会如下所示：
 
 ```rust
 use rltk::{GameState, Rltk, RGB};
@@ -310,27 +311,29 @@ fn main() -> rltk::BError {
 }
 ```
 
-Running it (with `cargo run`) will give you the following:
+将它运行(使用`cargo run`)，输出的内容如下所示：
 
 ![Screenshot](./c2-s1.png)
 
-## An example system - random movement
+## 一个示例系统 - 随机移动
 
-This example showed you how an ECS can get a disparate bag of entities to render. Go ahead and play around with the entity creation - you can do a lot with this! Unfortunately, it's pretty boring - nothing is moving! Lets rectify that a bit, and make a shooting gallery type look.
+本示例向你展示了 ECS 如何获取不同包的实体进行渲染。继续进行实体创建 - 你可以做很多事情！不幸的是，它相当的无趣 - 没有东西 正在移动！让我们对其进行纠正(rectify)，让它看起来像一个射击场。
 
-First, we'll create a new component called `LeftMover`. Entities that have this component are indicating that they really like going to the left. The component definition is very simple; a component with no data like this is called a "tag component". We'll put it up with our other component definitions:
+首先，我们将会创建一个名为`LeftMover`的组件。具有此组件的实体表明它们确实喜欢向左移动。该组件的定义非常简单；一个没有数据的组件，可以称其为“标签组件”。我们将其与其他组件的定义放在一起：
 
 ```rust
 #[derive(Component)]
 struct LeftMover {}
 ```
 
-Now we have to tell the ECS to use the type. With our other `register` calls, we add:
+现在我们需要告诉 ECS 来使用这个组件类型，通过添加另一个`register`调用：
+
 ```rust
 gs.ecs.register::<LeftMover>();
 ```
 
-Now, lets only make the red smiley faces left movers. So their definition grows to:
+现在只允许红色的笑脸移动。因此它们的定义变为：
+
 ```rust
 for i in 0..10 {
     gs.ecs
@@ -346,9 +349,9 @@ for i in 0..10 {
 }
 ```
 
-Notice how we've added one line: `.with(LeftMover{})` - that's all it takes to add one more component to these entities (and not the yellow `@`).
+注意到我们添加了新的一行：`.with(LeftMover{})` - 这就是为一个实体添加组件的全部。
 
-Now to actually *make them move*. We're going to define our first *system*. Systems are a way to contain entity/component logic together, and have them run independently. There's lots of complex flexibility available, but we're going to keep it simple. Here's everything required for our `LeftWalker` system:
+现在开始让它们动起来吧。我们将定义我们的第一个系统。系统是一种将实体/组件的逻辑整合在一起的方式，并让它们独立运行。这里有很多复杂的灵活性，但是我们将使其保持简单。这是我们`LeftWalker`系统所需要的一切：
 
 ```rust
 struct LeftWalker {}
@@ -366,18 +369,18 @@ impl<'a> System<'a> for LeftWalker {
 }
 ```
 
-This isn't as nice/simple as I'd like, but it does make sense when you understand it. Lets go through it a piece at a time:
+这不像我想的那样简单，但是当你理解了之后确实会很有意义。让我们一起浏览一下上面的代码：
 
-* `struct LeftWalker {}` just defines an empty structure - somewhere to attach the logic.
-* `impl<'a> System<'a> for LeftWalker` means we are implementing Specs' `System` trait for our `LeftWalker` structure. The `'a` are *lifetime* specifiers: the system is saying that the components it uses must exist long enough for the system to run. For now, it's not worth worrying too much about it. [If you are interested, the Rust Book can clarify a bit](https://doc.rust-lang.org/book/ch10-00-generics.html).
-* `type SystemData` is defining a type to tell Specs what the system requires. In this case, read access to `LeftMover` components, and write access (since it updates them) to `Position` components. You can mix and match whatever you need in here, as we'll see in later chapters.
-* `fn run` is the actual trait implementation, required by the `impl System`. It takes itself, and the `SystemData` we defined.
-* The for loop is system shorthand for the same iteration we did in the rendering system: it will run once for each entity that has both a `LeftMover` and a `Position`. Note that we're putting an underscore before the `LeftMover` variable name: we never actually use it, we just require that the entity *has* one. The underscore tells Rust "we know we aren't using it, this isn't a bug!" and stops it from warning us every time we compile.
-* The meat of the loop is very simple: we subtract one from the position component, and if it is less than zero we scoot back to the right of the screen.
+* `struct LeftWalker {}`仅仅定义了一个空的结构 - 被用来附加逻辑的地方。
+* `impl<'a> System<'a> for LeftWalker`意思是我们为`LeftWalker`结构实现了 Specs 的`System`接口。`'a`是*生命周期*的标识符：为了系统的正常运行，该组件必须存在足够长的时间。现在，不太值得为其倾注太多的关注。如果你对其感兴趣，[rus程序设计](https://kaisery.github.io/trpl-zh-cn/ch10-00-generics.html)可以做一些说明。
+* `type SystemData`是一种正在定义的类型，告诉 Specs 系统需要什么。在这里，读取访问`LeftMover`组件，并对`Position`组件进行写请求访问(因为它更新了它们)，你可以在这里混合并匹配你需要的一切，就像我们将在之后的章节看到的那样。
+* `fn run`是trait实现，被`impl System`所需要。它包含自己的引用(&mut self)以及我们定义的`SystemData`。
+* for循环是我们在渲染系统中进行相同迭代的系统简写：它会为每一个拥有`LeftMover`和`Position`的实体运行一次。请注意，我们在`LeftMover`变量名之前加了下划线：我们永远不会真正的用到它，我们只需要该实体有一个即可。下划线告诉 Rust “我们知道我们不糊用到它，这不是个bug”，并在我们每一次编译的时候停止关于这个问题的警告。
+* 循环的内容很简单：我们从`Position`组件中减1，如果它小于0，则滑动到屏幕的右侧。
 
-Notice that this is *very* similar to how we wrote the rendering code - but instead of calling *in* to the ECS, the ECS system is calling *into* our function/system. It can be a tough judgment call on which to use. If your system *just* needs data from the ECS, then a system is the right place to put it. If it also needs access to other parts of your program, it is probably better implemented on the outside - calling in.
+注意，这非常类似于我们编写渲染代码的方式 - 但是 ECS 系统并不是调用 ECS，而是调用我们的功能/系统。使用哪一个可能是个艰难的判断。如果你的系统只是需要 ECS 中的数据，那么系统是放置它的正确位置。如果它也需要访问你程序中的某一部分，那最好在外面实现。
 
-Now that we've *written* our system, we need to be able to use it. We'll add a `run_systems` function to our `State`:
+既然我们已经写完了我们的*系统*，我们需要能够使用它。我们在`State`中添加了`run_systems`函数。
 
 ```rust
 impl State {
@@ -389,23 +392,23 @@ impl State {
 }
 ```
 
-This is relatively straightforward:
+这是相对简单的：
 
-1. `impl State` means we would like to implement functionality for `State`.
-2. `fn run_systems(&mut self)` means we are defining a *function*, and it needs *mutable* (i.e. it is allowed to change things) access to *self*; this means it can access the data in its instance of `State` with the `self.` keyword.
-3. `let mut lw = LeftWalker{}` makes a new (changeable) instance of the `LeftWalker` system.
-4. `lw.run_now(&self.ecs)` tells the system to run, and tells it how to find the ECS.
-5. `self.ecs.maintain()` tells Specs that if any changes were queued up by the systems, they should apply to the world now.
-
-Finally, we actually want to run our systems. In the `tick` function, we add:
+1. `impl State`意思是我们将要实现`State`的功能。
+2. `fn run_systems(&mut self)`意思是我们定义了一个*函数*，并且它需要访问*可变*(比如：它被允许改变一些东西)的*self*。这意味着它可以使用`.self`关键字访问`State`的实例中的数据。
+3. `let mut lw = LeftWalker{}`为`LeftWalker`系统创建了一个新的(可变)的实例。
+4. `lw.run_now(&self.ecs)`告诉系统需要运行以及如何找到 ECS。
+5. `self.ecs.maintain()`告诉 Specs 如果系统将任何更改放入了队列中，则它们应该立即应用于 world。
+最后，我们想要运行我们的系统。在`tick`函数中，我们添加：
 
 ```rust
 self.run_systems();
 ```
 
-The nice thing is that this will run *all* systems we register into our dispatcher; so as we add more, we don't have to worry about calling them (or even calling them in the right order). You still sometimes need more access than the dispatcher has; our renderer isn't a system because it needs the `Context` from RLTK (we'll improve that in a future chapter).
+令人高兴的是，这将运行我们在调度程序中注册的所有系统；因此，当我们添加更多系统时，不需要担心调用它们(甚至以正确的顺序调用它们)。有时候你仍需要比调度程序更多的访问权限；我们的渲染器不是系统，因为它需要RLTK的`Context`(我们将在以后的章节中进行改进)。
 
-So your code now looks like this:
+因此在你的代码中看起来像这样：
+
 ```rust
 use rltk::{GameState, Rltk, RGB};
 use specs::prelude::*;
@@ -508,26 +511,26 @@ fn main() -> rltk::BError {
 }
 ```
 
-If you run it (with `cargo run`), the red smiley faces zoom to the left, while the `@` watches.
+如果你将它运行(使用`cargo run`)，红色的笑脸向左移动，而黄色的`@`在一旁注视着。 
 
 ![Screenshot](./c2-s2.gif)
 
-## Moving the player
+## 移动玩家
 
-Finally, lets make the `@` move with keyboard controls. So we know which entity is the player, we'll make a new tag component:
+最后，让键盘控制`@`的移动。因此我们知道哪一个实体是玩家，我们将创建一个新的标签组件：
 
 ```rust
 #[derive(Component, Debug)]
 struct Player {}
 ```
 
-We'll add it to registration:
+我们将其添加到注册中：
 
 ```rust
 gs.ecs.register::<Player>();
 ```
 
-And we'll add it to the player's entity:
+我们也将它添加到玩家的实体中：
 
 ```rust
 gs.ecs
@@ -542,7 +545,7 @@ gs.ecs
     .build();
 ```
 
-Now we implement a new function, `try_move_player`:
+现在我们实现一个新的函数`try_move_player`：
 
 ```rust
 fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
@@ -556,9 +559,9 @@ fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 }
 ```
 
-Drawing on our previous experience, we can see that this gains write access to `Player` and `Position`. It then joins the two, ensuring that it will only work on entities that have both component types - in this case, just the player. It then adds `delta_x` to `x` and `delta_y` to `y` - and does some checks to make sure that you haven't tried to leave the screen.
+根据我们以前的绘制经验，我们可以看到这获得了对`Player`和`Position`的写访问权限。然后将两者结合在一起，确保只适用于同时具有两种组件类型的实体 - 在这个示例中，只有玩家这个实体满足。然后它将`x`加上`delta_x`，`y`加上`delta_y` - 并进行一些检查，确保你没有尝试离开屏幕。
 
-We'll add a second function to read the keyboard information provided by RLTK:
+我们将添加第二个函数来读取由 RLTK 提供的键盘信息：
 
 ```rust
 fn player_input(gs: &mut State, ctx: &mut Rltk) {
@@ -576,29 +579,29 @@ fn player_input(gs: &mut State, ctx: &mut Rltk) {
 }
 ```
 
-There's quite a bit of functionality here that we haven't seen before! The *context* is providing information about a key - but the user may or may not be pressing one! Rust provides a feature for this, called `Option` types. `Option` types have two possible value: `None` (no data), or `Some(x)` - indicating that there is data here, held inside.
+这里有很多我们从未见过的功能！*上下文*提供了关于按键的信息 - 但是用户可能会，也可能不会按下一个按键！Rust为此提供了一个功能，叫做`Option`类型。`Option`有两个可能的值：`None` (没有数据)， or `Some(x)` - 表示有数据保存在里面。
 
-The *context* provides a `key` variable. It is an *enumeration* - that is, a variable that can hold a value from a set of pre-defined values (in this case, keys on the keyboard). Rust enumerations are *really* powerful, and can actually hold values as well - but we won't use that yet.
+*上下文*提供了一个`key`变量。它是一个*枚举* - 也就是说，可以保存一组预定义值中的某个值(在本例中为键盘上的键)。Rust 的枚举十分强大，而且实际上也可以保存值 - 但是我们目前不会用到。
 
-So to get the data out of an `Option`, we need to *unwrap* it. There's a function called `unwrap` - but if you call it when there isn't any data, your program will crash! So we'll use Rust's `match` command to peek inside. Matching is one of Rust's strongest benefits, and I highly recommend [the Rust book chapter on it](https://doc.rust-lang.org/book/ch06-00-enums.html), or the [Rust by Example section](https://doc.rust-lang.org/rust-by-example/flow_control/match.html) if you prefer learning by examples.
+想要从`Option`中取出数据，我们需要*拆开*它. 这里有个函数叫作`unwrap` - 但是如果当他没有任何数据时，你却使用这个函数调用它，程序将会崩溃！因此我们将用 Rust 的`match`命令来窥探它的内部。匹配是 Rust 的最大优势之一，我强烈推荐阅读[rust程序设计](https://doc.rust-lang.org/book/ch06-00-enums.html)中关于这一部分的讲解, 如果你更喜欢按照例子学习，你可以参阅[Rust by Example](https://doc.rust-lang.org/rust-by-example/flow_control/match.html)。
 
-So we call `match ctx.key` - and Rust expects us to provide a list of possibles matches. In the case of `ctx.key`, there are only two possible values: `Some` or `None`. The `None => {}` line says "match the case in which `ctx.key` has no data" - and runs an empty block. `Some(key)` is the other option; there is *some* data - and we'll ask Rust to give it to us as a variable named `key` (you can name it whatever you like).
+因此我们调用`match ctx.key` - Rust希望我们提供一些可能的匹配值的清单。在本示例中的`ctx.key`，只有两种可能的值：`Some` 或者`None`。`None => {}`行表示“匹配`ctx.key`没有值的情况” - 并在一个空白块中运行。`Some(key)`是另一个可选项；这里有一些值 - 并且我们让 Rust 将其当作名为`key`的变量提供给我们(你可以将其命名为任何你喜欢的名字)。
 
-We then `match` again, this time on the key. We have a line for each eventuality we want to handle: `VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs)` says that if `key` equals `VirtualKeyCode::Left` (`VirtualKeyCode` is the name of the enumeration type), we should call our `try_move_player` function with (-1, 0). We repeat that for all four directions. The `_ => {}` is rather odd looking; `_` means *anything else*. So we're telling Rust that any other key code can be ignored here. Rust is rather pedantic: if you don't specify every possible enumeration, it will give a compiler error! By including the default, we don't have to type every possible keystroke.
+我们再一次进行匹配，这一次是对于按键进行匹配。对于要处理的每一种可能，我们都有一行代码与其对应：`VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs)`表示如果`key`等于`VirtualKeyCode::Left` (`VirtualKeyCode`是枚举类型的名称)，我们应该调用`try_move_player`函数，入参为(-1, 0)。我们为四个方向重复这一块代码。`_ => {}`看起来相当奇怪。`_` 表示*其他部分*。因此我们告诉 Rust 其他的按键码在这里可以被忽略。Rust 相当古怪：如果你不指定每一种可能的枚举，它将会产生编译器错误！通过包含默认值，我们不需要输入每一种可能的按键。
 
-This function takes the current game state and context, looks at the `key` variable in the context, and calls the appropriate move command if the relevant movement key is pressed. Lastly, we add it into `tick`:
+该函数通过获取当前游戏的状态和上下文，在上下文中查找`key`变量，如果按下了相关的移动键，则调用适当的移动命令。最后我们将添加到`tick`中：
 
 ```rust
 player_input(self, ctx);
 ```
 
-If you run your program (with `cargo run`), you now have a keyboard controlled `@` symbol, while the smiley faces zoom to the left!
+如果你运行程序(通过`cargo run`)，你将有一个键盘控制符号`@`，而笑脸则向左移动。
 
 ![Screenshot](./c2-s3.gif)
 
-## The final code for chapter 2
+## 第二节的完整代码
 
-The source code for this completed example may be found ready-to-run in `chapter-02-helloecs`. It looks like this:
+这个示例的完整源代码可以在`chapter-02-helloecs`中找到。它看起来像这样：
 
 ```rust
 use rltk::{GameState, Rltk, RGB, VirtualKeyCode};
@@ -734,11 +737,11 @@ fn main() -> rltk::BError {
 }
 ```
 
-This chapter was a lot to digest, but provides a really solid base on which to build. The great part is: you've now got further than many aspiring developers! You have entities on the screen, and can move around with the keyboard.
+本章的内容很多，但是提供了扎实的基础。最重要的是：你现在比许多有抱负的开发人员走的更远！你的屏幕上有实体，并且可以根据按键四处移动。
 
-**The source code for this chapter may be found [here](https://github.com/thebracket/rustrogueliketutorial/tree/master/chapter-02-helloecs)**
+**这一节的源代码可以在[这里](https://github.com/thebracket/rustrogueliketutorial/tree/master/chapter-02-helloecs)找到**
 
-[Run this chapter's example with web assembly, in your browser (WebGL2 required)](https://bfnightly.bracketproductions.com/rustbook/wasm/chapter-02-helloecs/)
+[在你的浏览器中使用web assembly来运行这一节的代码(需要WebGL2)](https://bfnightly.bracketproductions.com/rustbook/wasm/chapter-02-helloecs/)
 
 ---
 
