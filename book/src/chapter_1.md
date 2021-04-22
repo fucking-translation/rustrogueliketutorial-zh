@@ -175,7 +175,7 @@ fn main() -> rltk::BError {
 
 保存，然后回到终端。输入`cargo run`，你会在终端窗口看到`Hello Rust`字样。
 
-![Screenshot](./c1-s1.png)
+![Screenshot](./img/c1-s1.png)
 
 如果你是Rust新手，你可能会疑惑`Hello Rust`代码干了些什么，和这里为什么要这么写 - 所以我们花一点时间浏览一下代码。
 

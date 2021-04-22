@@ -313,7 +313,7 @@ fn main() -> rltk::BError {
 
 将它运行(使用`cargo run`)，输出的内容如下所示：
 
-![Screenshot](./c2-s1.png)
+![Screenshot](./img/c2-s1.png)
 
 ## 一个示例系统 - 随机移动
 
@@ -513,7 +513,7 @@ fn main() -> rltk::BError {
 
 如果你将它运行(使用`cargo run`)，红色的笑脸向左移动，而黄色的`@`在一旁注视着。 
 
-![Screenshot](./c2-s2.gif)
+![Screenshot](./img/c2-s2.gif)
 
 ## 移动玩家
 
@@ -597,7 +597,7 @@ player_input(self, ctx);
 
 如果你运行程序(通过`cargo run`)，你将有一个键盘控制符号`@`，而笑脸则向左移动。
 
-![Screenshot](./c2-s3.gif)
+![Screenshot](./img/c2-s3.gif)
 
 ## 第二节的完整代码
 
