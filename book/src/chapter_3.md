@@ -10,13 +10,13 @@
 
 ---
 
-The remainder of this tutorial will be dedicated to making a Roguelike. [Rogue](https://en.wikipedia.org/wiki/Rogue_(video_game) appeared in 1980, as a text-mode dungeon exploration game. It has spawned an entire genre of "roguelikes": procedurally generated maps, hunting an objective over multiple levels and "permadeath" (restart when you die). The definition is the source of many online fights; I'd rather avoid that!
+本教程的剩余部分将专门讲述制作一个 Roguelike 游戏。[Rogue](https://en.wikipedia.org/wiki/Rogue_video_game) 诞生于 1980，是一个文本模式的地牢探索游戏。它催生出一个完整的“roguelikes”游戏风格：程序生成的地图，在多个级别上搜寻目标并 “permadeath” (死后游戏重启)。这个定义是许多线上战斗游戏的来源；我宁愿避免这种情况！
 
-A Roguelike without a map to explore is a bit pointless, so in this chapter we'll put together a basic map, draw it, and let your player walk around a bit. We're starting with the code from chapter 2, but with the red smiley faces (and their leftward tendencies) removed.
+一个没有探索地图的 Roguelike 游戏是没有意义的，因此在这一节我们将整理出一张地图，绘制并让你的游戏角色上在上面行走。我们从第二节的代码开始，但是移除了其中红色的笑脸及其向左运行的倾向。
 
-## Defining the map tiles
+## 定义地图图块
 
-We'll start by allowing two tile types: walls and floors. We can represent this with an `enum` (to learn more about enumerations, [The Rust Book](https://doc.rust-lang.org/book/ch06-00-enums.html) has a *large* section on them):
+我们将允许两种图块类型：`Wall`以及`Floor`。我们可以用一个`enum`来表示它们 (学习更多关于枚举的内容，请参阅[rust 程序设计](https://doc.rust-lang.org/book/ch06-00-enums.html))：
 
 ```rust
 #[derive(PartialEq, Copy, Clone)]
@@ -25,13 +25,13 @@ enum TileType {
 }
 ```
 
-Notice that we've included some derived features (more usage of derive macros, this time built into Rust itself): `Copy` and `Clone`. `Clone` adds a `.clone()` method to the type, allowing a copy to be made programmatically. `Copy` changes the default from *moving* the object on assignment to making a copy - so `tile1 = tile2` leaves both values valid and not in a "moved from" state.
+注意到我们使用了一些派生特性 (大量的使用派生宏，这里是 Rust 自身内置的)：`Copy`和`Clone`。`Clone`给类型添加了一个`.clone()`方法，允许以编程的方式进行拷贝。`Copy`将对象中默认的*转移所有权*的分配方式改成了拷贝 - 因此在`tile1 = tile2`之后，两个值依然合法有效，而不是进入了一种“转移所有权后的”状态。
 
-`PartialEq` allows us to use `==` to see if two tile types match. If we *didn't* derive these features, `if tile_type == TileType::Wall` would fail to compile!
+`PartialEq`允许我们使用`==`对两个图块类型进行匹配。如果我们不派生这些特性，`if tile_type == TileType::Wall`将会编译失败！
 
-## Building a simple map
+## 构建一个简单的地图
 
-Now we'll make a function that returns a `vec` (vector) of tiles, representing a simple map. We'll use a vector sized to the whole map, which means we need a way to figure out which array index is at a given x/y position. So first, we make a new function `xy_idx`:
+我们将会创建一个返回图块`vec`的函数，用来表示一个简单的地图。我们将使用一个大小适用于整张地图的向量，这意味着我们需要一种方式来确定哪个数组索引位于给定的 x/y 坐标上。因此首先，我们创建一个名为`xy_idx`的函数：
 
 ```rust
 pub fn xy_idx(x: i32, y: i32) -> usize {
@@ -39,11 +39,12 @@ pub fn xy_idx(x: i32, y: i32) -> usize {
 }
 ```
 
-This is simple: it multiplies the `y` position by the map width (80), and adds `x`. This guarantees one tile per location, and efficiently maps it in memory for left-to-right reading.
+这个函数很简单：它将`y`轴的值乘上地图的宽度 80，然后再加上`x`轴上的值。它保证了每个位置都会有一个图块，并高效的将其映射进内存中，以实现“从左到右”的读取。
 
-We're using a Rust function shorthand here. Notice that the function returns a `usize` (equivalent to `size_t` in C/C++ - whatever the basic size type used for a platform is) - and the function body lacks a `;` at the end? Any function that ends with a statement that lacks a semicolon treats that line as a `return` statement. So it's the same as typing `return (y as usize * 80) + x as usize`. This comes from the Rust author's *other* favorite language, `ML` - which uses the same shorthand. It's considered "Rustacean" (canonical Rust; I always picture a Rust Monster with cute little claws and shell) to use this style, so we've adopted it for the tutorial.
+我们在这里使用 rust 函数的简写方式。注意到该函数返回了一个`usize` (等价于 C/C++ 中的`size_t`) - 并且函数体在最后缺少一个`;`，在 rust 中，任何函数的结束语句如果缺少`;`，则该行将被视为`return`语句。因此它与`return (y as usize * 80) + x as usize`等价。这个特性来自于 rust 作者喜欢的的另一门语言，`ML` - 它使用与之相同的简写风格。使用这种风格将被视为“Rustaean” (规范的 rust；我总是将其想象成一个带有可爱的小爪子以及外壳的 rust 怪兽)，因此在本教程中，我们也将采用这种方式。
 
-Then we write a *constructor* function to make a map:
+接着，我们编写一个*构造函数*来创建一个地图：
+
 ```rust
 fn new_map() -> Vec<TileType> {
     let mut map = vec![TileType::Floor; 80*50];
@@ -75,21 +76,21 @@ fn new_map() -> Vec<TileType> {
 }
 ```
 
-There's a fair amount of syntax that we haven't encountered before here, so lets break this down:
+这里有几个我们之前没遇到过的语法，因此让我们来分析一下：
 
-1. `fn new_map() -> Vec<TileType>` species a function named `new_map`. It doesn't take any parameters, so it can be called from anywhere.
-2. It *returns* a `Vec`. `Vec` is a Rust *Vector* (if you're familiar with C++, it's pretty much exactly the same as a C++ `std::vector`). A vector is like an *array* (see [this Rust by Example chapter](https://doc.rust-lang.org/rust-by-example/primitives/array.html)), which lets you put a bunch of data into a list and access each element. Unlike an *array*, a `Vec` doesn't have a size limit - and the size can change while the program runs. So you can `push` (add) new items, and `remove` them as you go. [Rust by Example has a great chapter on Vectors](https://doc.rust-lang.org/rust-by-example/std/vec.html); it's a good idea to learn about them - they are used *everywhere*.
-3. `let mut map = vec![TileType::Floor; 80*50];` is a confusing looking statement! Lets break it down:
-    1. `let mut map` is saying "make a new variable" (`let`), "let me change it" (`mut`) and call it "map".
-    2. `vec!` is a *macro*, another one build into the Rust standard library. The exclamation mark is Rust's way of saying "this is a procedural macro" (as opposed to a derive macro, like we've seen before). Procedural macros run like a function - they define a *procedure*, they just greatly reduce your typing.
-    3. The `vec!` macro takes its parameters in square brackets.
-    4. The first parameter is the *value* for each element of the new vector. In this case, we're setting every entry we create to be a `Floor` (from the `TileType` enumeration).
-    5. The second parameter is how many tiles we should create. They will all be set to the value we set above. In this case, our map is 80x50 tiles (4,000 tiles - but we'll let the compiler do the math for us!). So we need to make 4,000 tiles.
-    6. You could have replaced the `vec!` call with `for _i in 0..4000 { map.push(TileType::Floor); }`. In fact, that's pretty much what the macro did for you - but it's definitely less typing to have the macro do it for you!
-4. `for x in 0..80 {` is a `for loop` ([see here](https://doc.rust-lang.org/rust-by-example/flow_control/for.html)), just like we used in the previous example. In this case, we're iterating `x` from 0 to 79.
-5. `map[xy_idx(x, 0)] = TileType::Wall;` first calls the `xy_idx` function we defined above to get the vector index for `x, 0`. It then *indexes* the vector, telling it to set the vector entry at that position to be a wall. We do this again for `x,49`.
-6. We do the same thing, but looping `y` from 0..49 - and setting the vertical walls on our map.
-7. `let mut rng = rltk::RandomNumberGenerator::new();` calls the `RandomNumberGenerator` type in `RLTK`'s `new` function, and assigns it to a variable called `rng`. We are asking RLTK to give us a new dice roller.
+1. `fn new_map() -> Vec<TileType>`指定了一个名为`new_map`的函数。它不携带任何参数，因此可以在任何地方调用。
+2. 该函数返回了一个`Vec`。`Vec`是一个 Rust 向量(如果你对 C++ 比较熟悉，它其实就是 C++ 中的`std::vector`)。向量类似于数组(请参阅 [Rust by Example](https://doc.rust-lang.org/rust-by-example/primitives/array.html)) 的这一章节，它可以让你将一堆数据放入列表中，并可以访问每一个元素。和数组不同，`Vec`没有大小的限制 - 并且它的大小还可以在程序运行的时候进行变更。因此你可以`push`(添加)新的元素，也可以将其`remove`。关于向量的内容，[Rust by Example](https://doc.rust-lang.org/rust-by-example/std/vec.html) 有一节讲解的很好；学习它们是个不错的主意 - 因为它们处处都在使用。
+3. `let mut map = vec![TileType::Floor; 80*50];`一个看起来让人感到疑惑的语句！让我们重点看一下：
+    1. `let mut map`意思是“创建一个新的变量”(`let`)，“让我可以对这个变量进行修改”(`mut`)并将这个变量命名为“map”。
+    2. `vec!`是另一个 Rust 标准库中内置的宏。感叹号 (exclamation mark) 表示这是一个过程宏 (和我们之前遇到的派生宏有所不同)。过程宏可以像函数一样运行 - 它们定义了一个过程，且只是减少了你们的输入而已。
+    3. `vec!`宏在中括号中传入参数。
+    4. 第一个参数是新创建的向量中每个元素的值。在这里，我们将每个条目都设置为`TileType`枚举中的`Floor`。
+    5. 第二个参数是指我们应该创建多少个图块。这些图块都将被设置为我们在上面指定的值。在这里，我们的地图是 80x50 个图块 (4,000 个图块 - 但是我们让编译器来计算这个值!)。因此我们需要 4,000 个图块。
+    6. 你可以通过调用`for _i in 0..4000 { map.push(TileType::Floor); }`来代替`vec!`。事实上，这就是该宏为你所做的事情 - 但是它确实减少了很多输入，很多事情都是宏自动帮你做了！
+4. `for x in 0..80 {`是一个`for loop` ([参阅这里](https://doc.rust-lang.org/rust-by-example/flow_control/for.html))，就像我们在之前的示例中所用的那样。在这里，我们从 0 迭代到 79。
+5. `map[xy_idx(x, 0)] = TileType::Wall;`首先调用`xy_idx`函数来获取`x, 0`的向量索引。然后它对向量进行检索，告诉它将这个位置的向量条目设置为`TileType::Wall`。我们对`x,49`又进行了一遍这样的操作。
+6. 我们对`y`做了同样的事情，将其从 0 迭代到 79 - 并在地图上设置垂直方向的墙 (wall)。
+7. `let mut rng = rltk::RandomNumberGenerator::new();`在`RLTK`中调用`RandomNumberGenerator`类型的`new`方法，并将其分配给一个名为`rng`的变量。我们让 RLTK 给我们一个新的随机数生成器。
 8. `for _i in 0..400 {` is the same as other `for` loops, but notice the `_` before `i`. We aren't actually looking at the value of `i` - we just want the loop to run 400 times. Rust will give you a warning if you have a variable you don't use; adding the underscore prefix tells Rust that it's ok, we meant to do that.
 9. `let x = rng.roll_dice(1, 79);` calls the `rng` we grabbed in 7, and asks it for a random number from 1 to 79. RLTK does *not* go with an exclusive range, because it is trying to mirror the old D&D convention of dice being `1d20` or similar. In this case, we should be glad that computers don't care about the geometric difficulty of inventing a 79-sided dice! We also obtain a `y` value between 1 and 49. We've rolled imaginary dice, and found a random location on the map.
 10. We set the variable `idx` (short for "index") to the vector index (via `xy_idx` we defined earlier) for the coordinates we rolled.
