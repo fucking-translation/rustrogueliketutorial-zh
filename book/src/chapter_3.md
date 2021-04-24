@@ -91,27 +91,27 @@ fn new_map() -> Vec<TileType> {
 5. `map[xy_idx(x, 0)] = TileType::Wall;`首先调用`xy_idx`函数来获取`x, 0`的向量索引。然后它对向量进行检索，告诉它将这个位置的向量条目设置为`TileType::Wall`。我们对`x,49`又进行了一遍这样的操作。
 6. 我们对`y`做了同样的事情，将其从 0 迭代到 79 - 并在地图上设置垂直方向的墙 (wall)。
 7. `let mut rng = rltk::RandomNumberGenerator::new();`在`RLTK`中调用`RandomNumberGenerator`类型的`new`方法，并将其分配给一个名为`rng`的变量。我们让 RLTK 给我们一个新的随机数生成器。
-8. `for _i in 0..400 {` is the same as other `for` loops, but notice the `_` before `i`. We aren't actually looking at the value of `i` - we just want the loop to run 400 times. Rust will give you a warning if you have a variable you don't use; adding the underscore prefix tells Rust that it's ok, we meant to do that.
-9. `let x = rng.roll_dice(1, 79);` calls the `rng` we grabbed in 7, and asks it for a random number from 1 to 79. RLTK does *not* go with an exclusive range, because it is trying to mirror the old D&D convention of dice being `1d20` or similar. In this case, we should be glad that computers don't care about the geometric difficulty of inventing a 79-sided dice! We also obtain a `y` value between 1 and 49. We've rolled imaginary dice, and found a random location on the map.
-10. We set the variable `idx` (short for "index") to the vector index (via `xy_idx` we defined earlier) for the coordinates we rolled.
-11. `if idx != xy_idx(40, 25) {` checks that `idx` isn't the exact middle (we'll be starting there, so we don't want to start inside a wall!).
-12. If it isn't the middle, we set the randomly rolled location to be a wall.
+8. `for _i in 0..400 {`和其他的`for`相同，但是注意到`i`前面的`_`。我们并不关心`i`的值 - 我们只是想要循环 400 次而已。如果你有一个未使用的变量，Rust 将会给你一个提示；在该变量之前添加一个下划线前缀让 Rust 知道(不使用该变量)是可以的，我们就是要这么做。
+9. `let x = rng.roll_dice(1, 79);`调用我们在第 7 点说明的`rng`，让它生成一个范围在 1 到 79 (包含) 之内的随机数。RLTK 并没有排除最大的值，因为它试图反应 1 个 20面骰子 (`1d20` 或类似的骰子，如`2d6`，即 2 个 6面骰，范围是 2 到 12) 的 D&D 惯例。在这里，我们应该庆幸计算机不关心发明一个 79 面骰子的几何难度！我们也会获取一个范围在 1 到 49 的`y`值。我们掷虚拟的骰子，并依此在地图上指定一个随机的位置。
+10. 我们将变量`idx` (”index“缩写)设置为向量的索引(通过我们之前定义的`xy_idx`)，以用于滚动的坐标。
+11. `if idx != xy_idx(40, 25) {`检查`idx`不在正中间(我们将这里作为起点，因此我们不希望从墙内开始)。
+12. 如果这不是中间位置，则我们将随机位置设置为墙。
 
-It's pretty simple: it places walls around the outer edges of the map, and then adds 400 random walls anywhere that isn't the player's starting point.
+这十分简单：它将墙放置在地图的外部边缘周围，然后在不是玩家起点位置的任何地方添加 400 个随机墙。
 
-## Making the map visible to the world
+## 让地图对世界可见
 
-Specs includes a concept of "resources" - shared data the whole ECS can use. So in our `main` function, we add a randomly generated map to the world:
+Specs 中包含了”resources“的概念 - 它共享资源，让整个 ECS 都可以使用。因此在我们的`main`函数中，我们在世界中添加了一个随机生成的地图：
 
 ```rust
 gs.ecs.insert(new_map());
 ```
 
-The map is now available from anywhere the ECS can see! Now inside your code, you can access the map with the rather unwieldy `let map = self.ecs.get_mut::<Vec<TileType>>();`; it's available to systems in an easier fashion. There's actually *several* ways to get the value of map, including `ecs.get`, `ecs.fetch`. `get_mut` obtains a "mutable" (you can change it) reference to the map - wrapped in an optional (in case the map isn't there). `fetch` skips the `Option` type and gives you a map directly. You can learn more about this [in the Specs Book](https://specs.amethyst.rs/docs/tutorials/04_resources.html).
+现在可以在 ECS 可以看到的任何地方使用该地图！在你的代码中，你可以通过相当笨重的`let map = self.ecs.get_mut::<Vec<TileType>>();`语句访问地图；系统可以轻松的使用它。这里有多种获取地图上的值得方法，包括`ecs.get`，`ecs.fetch`。`get_mut`可以获取地图的可变引用(你可以对其进行修改) - 它封装在`Option`中(以防不存在该地图)。`fetch`跳过`Option`类型并直接给你一个地图。你可以在 [Specs Book](https://specs.amethyst.rs/docs/tutorials/04_resources.html) 中了解更多内容。
 
-## Draw the map
+## 绘制地图
 
-Now that we have a map available, we should put it on the screen! The complete code for the new `draw_map` function looks like this:
+既然我们已经有了一个可用的地图，我们应该将其打印在屏幕上！完整的绘制地图的代码如下所示：
 
 ```rust
 fn draw_map(map: &[TileType], ctx : &mut Rltk) {
@@ -138,18 +138,18 @@ fn draw_map(map: &[TileType], ctx : &mut Rltk) {
 }
 ```
 
-This is mostly straightforward, and uses concepts we've already visited. In the declaration, we pass the map as `&[TileType]` rather than `&Vec<TileType>`; this allows us to pass in "slices" (parts of) a map if we so choose. We won't do that yet, but it may be useful later. It's also considered a more "rustic" (that is: idiomatic Rust) way to do things, and the linter (`clippy`) warns about it. [The Rust Book can teach you about slices, if you are interested](https://doc.rust-lang.org/rust-by-example/primitives/array.html).
+这非常简单，并且使用的是我们已经介绍过的概念。在声明中，我们将地图作为`&[TileType]`而不是`&Vec<TileType>`传入；这可以让我们传入地图的(部分)切片，如果我们想要这么做的话。我们现在还不会这么做，但是在之后这将很有用。这也是 Rust 中一种惯用的方式 (idiomatic Rust)，但是`clippy` 代码校验可能会发出警告。[如果你感兴趣的话，rust 程序设计可以告诉你更多关于切片的内容](https://doc.rust-lang.org/rust-by-example/primitives/array.html)。
 
-Otherwise, it takes advantage of the way we are storing our map - rows together, one after the other. So it iterates through the entire map structure, adding 1 to the `x` position for each tile. If it hits the map width, it zeroes `x` and adds one to `y`. This way we aren't repeatedly reading all over the array - which can get slow. The actual rendering is very simple: we `match` the tile type, and draw either a period or a hash for walls/floors.
+否则，它将利用我们存储地图的方式，一行接一行的存储。因此它遍历了整个地图的结构，将每个图块的`x`坐标加 1。如果达到了地图的宽度，则将`x`  清零，并将其加到`y`上。使用这种方式就不用在地图上重复读取 - 那会降低程序的性能。实际的渲染十分简单：我们`match`图块的类型，并绘制墙/地板的周期或哈希值。
 
-We should also call the function! In our `tick` function, add:
+我们应该调用该函数！在我们的`tick`函数中，添加：
 
 ```rust
 let map = self.ecs.fetch::<Vec<TileType>>();
 draw_map(&map, ctx);
 ```
 
-The `fetch` call is new (we mentioned it above). `fetch` requires that you promise that you know that the resource you are requesting really does exist - and will crash if it doesn't. It doesn't *quite* return a reference - it's a `shred` type, which *acts* like a reference most of the time but occasionally needs a bit of coercing to *be* one. We'll worry about that bridge when it comes time to cross it, but consider yourself warned!
+我们在之前都没有遇到过`fetch`函数。`fetch` requires that you promise that you know that the resource you are requesting really does exist - and will crash if it doesn't. It doesn't *quite* return a reference - it's a `shred` type, which *acts* like a reference most of the time but occasionally needs a bit of coercing to *be* one. We'll worry about that bridge when it comes time to cross it, but consider yourself warned!
 
 ## Making walls solid
 
