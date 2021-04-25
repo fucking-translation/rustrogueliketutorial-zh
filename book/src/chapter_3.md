@@ -149,13 +149,13 @@ let map = self.ecs.fetch::<Vec<TileType>>();
 draw_map(&map, ctx);
 ```
 
-我们在之前都没有遇到过`fetch`函数。`fetch`需要你确保请求的资源确实存在 -  否则变回崩溃。它没有返回一个引用 - 而是一个`shared` 类型，它大多数时间都和引用的行为一样，但是偶尔需要一些胁迫 (coerce) 才会成为一个引用。当需要过桥时我们将会关心这个问题，除了考虑你自己被警告which *acts* like a reference most of the time but occasionally needs a bit of coercing to *be* one. We'll worry about that bridge when it comes time to cross it, but consider yourself warned!
+我们在之前都没有遇到过`fetch`函数。`fetch`需要你确保请求的资源确实存在 -  否则变回崩溃。它没有返回一个引用 - 而是一个`shared` 类型，它大多数时间都和引用的行为一样，但是偶尔需要一些胁迫 (coerce) 才会成为一个引用。当需要过桥时我们将会关心这个问题，除了考虑你自己被警告!
 
-## Making walls solid
+## 使墙壁坚固
 
-So now if you run the program (`cargo run`), you'll have a green and grey map with a yellow `@` who can move around. Unfortunately, you'll quickly notice that the player can walk through walls! Fortunately, that's pretty easy to rectify.
+所以如果你现在运行程序(`cargo run`)，你将有一个绿色以及灰色的地图，黄色的`@`可以在上面移动。不幸的是，你将很快注意到玩家可以穿墙而过！幸运的是，这个问题很好解决 (rectify 纠正)。
 
-To accomplish this, we modify the `try_move_player` to read the map and check that the destination is open:
+为了实现这个功能，我们修改`try_move_player`函数，让其读取地图并检查目的地是否开放：
 
 ```rust
 fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
@@ -173,9 +173,9 @@ fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 }
 ```
 
-The new parts are the `let map = ...` part, which uses `fetch` just the same way as the main loop (this is the advantage of storing it in the ECS - you can get to it everywhere without trying to coerce Rust into letting you use global variables!). We calculate the cell index of the player's destination with `let destination_idx = xy_idx(pos.x + delta_x, pos.y + delta_y);` - and if it isn't a wall, we move as normal.
+`let map = ...`部分是新加的，它就像主循环一样使用`fetch`(这有利于将其存储在 ECS 中 - 你可以在任何地方获取到它，而不需要迫使 Rust 使用全局变量！)。我们通过`let destination_idx = xy_idx(pos.x + delta_x, pos.y + delta_y);`计算玩家目的地的单元索引 - 如果它不是一道墙，我们就正常的移动。
 
-Run the program (`cargo run`) now, and you have a player in a map - and can move around, properly obstructed by walls.
+现在运行程序 (`cargo run`)，你的玩家将在地图中随处移动，适当的会被墙壁阻挡 (obstruct)。
 
 ![Screenshot](./img/c3-s1.gif)
 
