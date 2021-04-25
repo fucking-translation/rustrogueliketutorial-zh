@@ -149,7 +149,7 @@ let map = self.ecs.fetch::<Vec<TileType>>();
 draw_map(&map, ctx);
 ```
 
-我们在之前都没有遇到过`fetch`函数。`fetch` requires that you promise that you know that the resource you are requesting really does exist - and will crash if it doesn't. It doesn't *quite* return a reference - it's a `shred` type, which *acts* like a reference most of the time but occasionally needs a bit of coercing to *be* one. We'll worry about that bridge when it comes time to cross it, but consider yourself warned!
+我们在之前都没有遇到过`fetch`函数。`fetch`需要你确保请求的资源确实存在 -  否则变回崩溃。它没有返回一个引用 - 而是一个`shared` 类型，它大多数时间都和引用的行为一样，但是偶尔需要一些胁迫 (coerce) 才会成为一个引用。当需要过桥时我们将会关心这个问题，除了考虑你自己被警告which *acts* like a reference most of the time but occasionally needs a bit of coercing to *be* one. We'll worry about that bridge when it comes time to cross it, but consider yourself warned!
 
 ## Making walls solid
 
@@ -177,7 +177,7 @@ The new parts are the `let map = ...` part, which uses `fetch` just the same way
 
 Run the program (`cargo run`) now, and you have a player in a map - and can move around, properly obstructed by walls.
 
-![Screenshot](./c3-s1.gif)
+![Screenshot](./img/c3-s1.gif)
 
 The full program now looks like this:
 
@@ -352,9 +352,9 @@ fn main() -> rltk::BError {
 }
 ```
 
-**The source code for this chapter may be found [here](https://github.com/thebracket/rustrogueliketutorial/tree/master/chapter-03-walkmap)**
+**这一节的源代码可以在[这里](https://github.com/thebracket/rustrogueliketutorial/tree/master/chapter-03-walkmap)找到**
 
-[Run this chapter's example with web assembly, in your browser (WebGL2 required)](https://bfnightly.bracketproductions.com/rustbook/wasm/chapter-03-walkmap/)
+[在你的浏览器中使用web assembly来运行这一节的代码(需要WebGL2)](https://github.com/thebracket/rustrogueliketutorial/tree/master/chapter-03-walkmap)
 
 ---
 
